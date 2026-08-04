@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+﻿/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -97,60 +97,60 @@ const featureCards = [
 ];
 
 const learningResources = [
-  { icon: FileText, title: "Lecture Notes", value: "4,800+", color: "text-cyan-300", surface: "bg-cyan-300/10" },
-  { icon: ClipboardCheck, title: "Previous Papers", value: "2,100+", color: "text-violet-300", surface: "bg-violet-300/10" },
-  { icon: Play, title: "Video Lessons", value: "1,400+", color: "text-pink-300", surface: "bg-pink-300/10" },
-  { icon: FileCode2, title: "Project Files", value: "3,700+", color: "text-emerald-300", surface: "bg-emerald-300/10" },
+  { icon: FileText, title: "Lecture Notes", value: "Beta", color: "text-cyan-300", surface: "bg-cyan-300/10" },
+  { icon: ClipboardCheck, title: "Previous Papers", value: "Beta", color: "text-violet-300", surface: "bg-violet-300/10" },
+  { icon: Play, title: "Video Lessons", value: "Coming soon", color: "text-pink-300", surface: "bg-pink-300/10" },
+  { icon: FileCode2, title: "Project Files", value: "Coming soon", color: "text-emerald-300", surface: "bg-emerald-300/10" },
 ];
 
 const communities = [
   {
     icon: Code2,
     title: "Code & Build",
-    members: "8.4K members",
+    members: "Beta community",
     description: "Daily shipping, peer code reviews, open-source squads, and hackathon teams.",
     color: "from-cyan-400 to-blue-500",
   },
   {
     icon: Lightbulb,
     title: "Founders Circle",
-    members: "5.2K members",
+    members: "Planned community",
     description: "Turn a campus problem into a product with co-founders, mentors, and early users.",
     color: "from-orange-400 to-pink-500",
   },
   {
     icon: Microscope,
     title: "Research Network",
-    members: "3.8K members",
+    members: "Planned community",
     description: "Discuss papers, discover labs, and find collaborators across disciplines.",
     color: "from-violet-400 to-fuchsia-500",
   },
 ];
 
 const engineeringClubs = [
-  { icon: Cpu, name: "Robotics & Automation", meta: "42 projects · 1.8K members", color: "from-cyan-400 to-blue-500" },
-  { icon: Zap, name: "EV & Energy Systems", meta: "31 projects · 1.2K members", color: "from-emerald-400 to-cyan-500" },
-  { icon: FileCode2, name: "Developer Student Club", meta: "88 projects · 3.4K members", color: "from-violet-400 to-fuchsia-500" },
-  { icon: Rocket, name: "Aero & Space Society", meta: "24 projects · 940 members", color: "from-orange-400 to-pink-500" },
+  { icon: Cpu, name: "Robotics & Automation", meta: "42 projects Â· 1.8K members", color: "from-cyan-400 to-blue-500" },
+  { icon: Zap, name: "EV & Energy Systems", meta: "31 projects Â· 1.2K members", color: "from-emerald-400 to-cyan-500" },
+  { icon: FileCode2, name: "Developer Student Club", meta: "88 projects Â· 3.4K members", color: "from-violet-400 to-fuchsia-500" },
+  { icon: Rocket, name: "Aero & Space Society", meta: "24 projects Â· 940 members", color: "from-orange-400 to-pink-500" },
 ];
 
 const testimonials = [
   {
     quote: "CampusLoop helped me find two teammates for our EV battery project in one evening. We went from an idea to a working prototype in six weeks.",
     name: "Aarav Mehta",
-    role: "Electrical Engineering · NIT Trichy",
+    role: "Electrical Engineering Â· NIT Trichy",
     avatar: "https://i.pravatar.cc/120?img=11",
   },
   {
     quote: "The resource library is the first place I check before every exam. The best notes are easy to find, verified, and actually organized by unit.",
     name: "Meera Nair",
-    role: "Computer Science · VIT Vellore",
+    role: "Computer Science Â· VIT Vellore",
     avatar: "https://i.pravatar.cc/120?img=45",
   },
   {
-    quote: "I discovered a research internship, prepared with the AI assistant, and connected with a senior from the same lab — all without leaving CampusLoop.",
+    quote: "I discovered a research internship, prepared with the AI assistant, and connected with a senior from the same lab â€” all without leaving CampusLoop.",
     name: "Rohan Verma",
-    role: "Mechanical Engineering · IIT Bombay",
+    role: "Mechanical Engineering Â· IIT Bombay",
     avatar: "https://i.pravatar.cc/120?img=12",
   },
 ];
@@ -174,7 +174,7 @@ const faqs = [
   },
   {
     question: "How does the AI assistant use my information?",
-    answer: "The assistant uses the context you choose to provide — such as subjects, deadlines, saved resources, and goals — to make answers more relevant. Your private drafts and personal workspace are not posted to communities.",
+    answer: "The assistant uses the context you choose to provide â€” such as subjects, deadlines, saved resources, and goals â€” to make answers more relevant. Your private drafts and personal workspace are not posted to communities.",
   },
 ];
 
@@ -312,13 +312,13 @@ function Navbar() {
         </div>
         <div className="hidden items-center gap-2 md:flex">
           <a
-            href="#signin"
+            href="/login"
             className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
           >
             Sign in
           </a>
           <a
-            href="#join"
+            href="/signup"
             className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
           >
             Join free
@@ -351,10 +351,10 @@ function Navbar() {
             </a>
           ))}
           <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/[0.07] pt-3">
-            <a href="#signin" className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm text-white">
+            <a href="/login" className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm text-white">
               Sign in
             </a>
-            <a href="#join" className="rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950">
+            <a href="/signup" className="rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950">
               Join free
             </a>
           </div>
@@ -486,14 +486,14 @@ function Hero() {
             variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
             className="mt-7 max-w-xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8"
           >
-            Meet your people. Master your courses. Build ambitious projects. Discover the opportunities that shape your future — all inside one intelligent campus network.
+            Meet your people. Master your courses. Build ambitious projects. Discover the opportunities that shape your future â€” all inside one intelligent campus network.
           </motion.p>
           <motion.div
             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
             className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
-            <GlowButton href="#join">Join CampusLoop free</GlowButton>
-            <GlowButton href="#dashboard" secondary>
+            <GlowButton href="/signup">Join CampusLoop free</GlowButton>
+            <GlowButton href="/dashboard" secondary>
               Explore the experience
             </GlowButton>
           </motion.div>
@@ -502,9 +502,9 @@ function Hero() {
             className="mt-10 grid max-w-lg grid-cols-3 divide-x divide-white/10"
           >
             {[
-              ["50K+", "Students"],
-              ["800+", "Communities"],
-              ["12K+", "Resources"],
+              ["Early", "Beta"],
+              ["Real", "Data only"],
+              ["Student-first", "Product"],
             ].map(([value, label], index) => (
               <div key={label} className={index === 0 ? "pr-4" : "px-4 sm:px-6"}>
                 <p className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{value}</p>
@@ -662,7 +662,7 @@ function LearningResources() {
           <SectionHeader
             eyebrow="Learning resources"
             title="The clearest path from syllabus to mastery."
-            description="Find what you need by university, branch, semester, subject, or topic — then save it into a study space that stays beautifully organized."
+            description="Find what you need by university, branch, semester, subject, or topic â€” then save it into a study space that stays beautifully organized."
             align="left"
           />
           <Reveal className="mt-9 flex flex-col gap-4 sm:flex-row">
@@ -680,7 +680,7 @@ function LearningResources() {
             <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.045] px-4 py-3.5">
               <Search className="size-4 text-slate-500" />
               <span className="text-sm text-slate-500">Search power systems, data structures, thermodynamics...</span>
-              <span className="ml-auto hidden rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-500 sm:block">⌘ K</span>
+              <span className="ml-auto hidden rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-500 sm:block">âŒ˜ K</span>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {learningResources.map((resource) => (
@@ -716,9 +716,9 @@ function LearningResources() {
 
 function DigitalLibrary() {
   const documents = [
-    { type: "Notes", title: "Power System Stability — Complete Unit Notes", author: "Ananya S.", rating: "4.9", pages: "42 pages", color: "bg-cyan-300" },
-    { type: "PYQ", title: "GATE EE Network Theory — Solved 2015–2026", author: "Rohit K.", rating: "4.8", pages: "86 pages", color: "bg-violet-300" },
-    { type: "Lab", title: "MATLAB Simulink for BMS — Practical Manual", author: "EV Systems Club", rating: "4.9", pages: "64 pages", color: "bg-emerald-300" },
+    { type: "Notes", title: "Power System Stability â€” Complete Unit Notes", author: "Ananya S.", rating: "4.9", pages: "42 pages", color: "bg-cyan-300" },
+    { type: "PYQ", title: "GATE EE Network Theory â€” Solved 2015â€“2026", author: "Rohit K.", rating: "4.8", pages: "86 pages", color: "bg-violet-300" },
+    { type: "Lab", title: "MATLAB Simulink for BMS â€” Practical Manual", author: "EV Systems Club", rating: "4.9", pages: "64 pages", color: "bg-emerald-300" },
   ];
 
   return (
@@ -727,7 +727,7 @@ function DigitalLibrary() {
         <SectionHeader
           eyebrow="Digital library"
           title="Your smartest shelf. Always with you."
-          description="Curated notes, books, papers, lab manuals, and project references — searchable in seconds and saved exactly where your brain expects them."
+          description="Curated notes, books, papers, lab manuals, and project references â€” searchable in seconds and saved exactly where your brain expects them."
         />
         <Reveal className="mt-14">
           <div className="overflow-hidden rounded-[2rem] border border-white/[0.09] bg-[#090d1d] shadow-[0_40px_120px_rgba(0,0,0,0.4)]">
@@ -759,7 +759,7 @@ function DigitalLibrary() {
                   <button type="button" className="rounded-xl border border-white/[0.08] px-4 py-3 text-sm text-slate-300">All subjects</button>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div><p className="text-sm font-semibold text-white">Recommended for you</p><p className="mt-1 text-xs text-slate-500">Based on Electrical Engineering · Semester 5</p></div>
+                  <div><p className="text-sm font-semibold text-white">Recommended for you</p><p className="mt-1 text-xs text-slate-500">Based on Electrical Engineering Â· Semester 5</p></div>
                   <button type="button" className="text-xs font-medium text-cyan-300">View all</button>
                 </div>
                 <div className="mt-5 grid gap-3">
@@ -849,7 +849,7 @@ function EngineeringClubs() {
             <div className="relative mb-3 h-56 overflow-hidden rounded-[1.4rem] sm:h-72">
               <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=88" alt="Engineering students collaborating on a technical project" className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#070a17] via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-xs font-medium text-white backdrop-blur-xl">Open builds this week · 36</div>
+              <div className="absolute bottom-4 left-4 rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-xs font-medium text-white backdrop-blur-xl">Open builds this week Â· 36</div>
             </div>
             <div className="space-y-2">
               {engineeringClubs.map((club, index) => (
@@ -935,9 +935,9 @@ function ProjectCollaboration() {
 
 function Hackathons() {
   const events = [
-    { month: "SEP", day: "18", title: "CampusLoop BuildSprint", mode: "Online + 12 campuses", prize: "₹5L prize pool", color: "from-cyan-400 to-blue-500" },
-    { month: "OCT", day: "04", title: "GreenTech Challenge", mode: "IIT Bombay · Mumbai", prize: "Industry mentorship", color: "from-emerald-400 to-cyan-500" },
-    { month: "OCT", day: "26", title: "AI for Bharat Hackathon", mode: "BITS Pilani · Hybrid", prize: "₹8L prize pool", color: "from-violet-400 to-fuchsia-500" },
+    { month: "SEP", day: "18", title: "CampusLoop BuildSprint", mode: "Online + 12 campuses", prize: "â‚¹5L prize pool", color: "from-cyan-400 to-blue-500" },
+    { month: "OCT", day: "04", title: "GreenTech Challenge", mode: "IIT Bombay Â· Mumbai", prize: "Industry mentorship", color: "from-emerald-400 to-cyan-500" },
+    { month: "OCT", day: "26", title: "AI for Bharat Hackathon", mode: "BITS Pilani Â· Hybrid", prize: "â‚¹8L prize pool", color: "from-violet-400 to-fuchsia-500" },
   ];
 
   return (
@@ -945,7 +945,7 @@ function Hackathons() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
           <SectionHeader eyebrow="Hackathons" title="Build under pressure. Break into your potential." description="Discover high-signal competitions, form a balanced team, track deadlines, and walk in with a plan worth shipping." align="left" />
-          <Reveal><SectionLink href="#join">See the full event calendar</SectionLink></Reveal>
+          <Reveal><SectionLink href="/signup">See the full event calendar</SectionLink></Reveal>
         </div>
         <div className="mt-14 grid gap-4 lg:grid-cols-3">
           {events.map((event, index) => (
@@ -970,9 +970,9 @@ function Hackathons() {
 
 function Internships() {
   const opportunities = [
-    { company: "Ather Energy", role: "Battery Systems Intern", location: "Bengaluru · On-site", tags: ["BMS", "MATLAB"], color: "bg-emerald-300 text-emerald-950" },
-    { company: "Microsoft", role: "Software Engineering Intern", location: "Hyderabad · Hybrid", tags: ["DSA", "React"], color: "bg-cyan-300 text-cyan-950" },
-    { company: "ISRO", role: "Research Project Trainee", location: "Ahmedabad · On-site", tags: ["Control", "Embedded"], color: "bg-orange-300 text-orange-950" },
+    { company: "Ather Energy", role: "Battery Systems Intern", location: "Bengaluru Â· On-site", tags: ["BMS", "MATLAB"], color: "bg-emerald-300 text-emerald-950" },
+    { company: "Microsoft", role: "Software Engineering Intern", location: "Hyderabad Â· Hybrid", tags: ["DSA", "React"], color: "bg-cyan-300 text-cyan-950" },
+    { company: "ISRO", role: "Research Project Trainee", location: "Ahmedabad Â· On-site", tags: ["Control", "Embedded"], color: "bg-orange-300 text-orange-950" },
   ];
 
   return (
@@ -997,8 +997,8 @@ function Internships() {
           </div>
         </Reveal>
         <div>
-          <SectionHeader eyebrow="Internships" title="The right opportunity, before everyone finds it." description="Get skill-matched internships, research roles, and industry projects — with alumni context and deadlines that never disappear in a chat." align="left" />
-          <Reveal className="mt-9"><GlowButton href="#join">Build your opportunity profile</GlowButton></Reveal>
+          <SectionHeader eyebrow="Internships" title="The right opportunity, before everyone finds it." description="Get skill-matched internships, research roles, and industry projects â€” with alumni context and deadlines that never disappear in a chat." align="left" />
+          <Reveal className="mt-9"><GlowButton href="/signup">Build your opportunity profile</GlowButton></Reveal>
           <Reveal className="mt-8 flex items-center gap-3 text-sm text-slate-500"><BadgeCheck className="size-5 text-emerald-300" /><span>Verified roles from trusted employers and campus cells</span></Reveal>
         </div>
       </div>
@@ -1018,7 +1018,7 @@ function Research() {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Research</p>
               <h2 className="mt-5 text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">Ideas deserve the right minds around them.</h2>
               <p className="mt-6 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">Follow research areas, discuss meaningful papers, discover open lab positions, and connect with students who can take the question further.</p>
-              <div className="mt-9"><GlowButton href="#join">Enter the research network</GlowButton></div>
+              <div className="mt-9"><GlowButton href="/signup">Enter the research network</GlowButton></div>
             </Reveal>
             <Reveal className="lg:justify-self-end">
               <div className="w-full max-w-md rounded-[1.75rem] border border-white/15 bg-[#080c1b]/75 p-5 shadow-2xl backdrop-blur-2xl sm:p-6">
@@ -1049,8 +1049,8 @@ function PlacementPreparation() {
       <div className="absolute left-1/2 top-1/2 size-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/[0.07] blur-[170px]" />
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
-          <SectionHeader eyebrow="Placement preparation" title="Walk into the interview already ready." description="Know where you stand, practice with intent, and turn preparation into a measurable weekly system — from resume to final HR round." align="left" />
-          <Reveal className="mt-9 flex flex-col gap-3 sm:flex-row"><GlowButton href="#join">Start your placement plan</GlowButton><GlowButton href="#ai-assistant" secondary>Try a mock interview</GlowButton></Reveal>
+          <SectionHeader eyebrow="Placement preparation" title="Walk into the interview already ready." description="Know where you stand, practice with intent, and turn preparation into a measurable weekly system â€” from resume to final HR round." align="left" />
+          <Reveal className="mt-9 flex flex-col gap-3 sm:flex-row"><GlowButton href="/signup">Start your placement plan</GlowButton><GlowButton href="#ai-assistant" secondary>Try a mock interview</GlowButton></Reveal>
           <Reveal className="mt-9 grid grid-cols-2 gap-3">
             {[["1,200+", "Company questions"], ["340+", "Mock interviews"], ["86%", "Profile completion"], ["24/7", "AI practice"]].map(([value, label]) => (
               <div key={label} className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"><p className="text-xl font-semibold text-white">{value}</p><p className="mt-1 text-xs text-slate-500">{label}</p></div>
@@ -1092,7 +1092,7 @@ function AIAssistant() {
             <div className="absolute right-0 top-1/2 size-[28rem] rounded-full bg-violet-600/[0.09] blur-[150px]" />
             <div className="relative grid min-h-[620px] lg:grid-cols-[300px_1fr]">
               <aside className="hidden border-r border-white/[0.07] p-5 lg:block">
-                <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 text-white"><Bot className="size-5" /></span><div><p className="text-sm font-semibold text-white">CampusAI</p><p className="text-[10px] text-emerald-300">● Ready to help</p></div></div>
+                <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 text-white"><Bot className="size-5" /></span><div><p className="text-sm font-semibold text-white">CampusAI</p><p className="text-[10px] text-emerald-300">â— Ready to help</p></div></div>
                 <button type="button" className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-xs font-semibold text-slate-950"><Plus className="size-4" /> New conversation</button>
                 <p className="mb-3 mt-8 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600">Recent</p>
                 {["Network Theory revision", "BMS project roadmap", "Resume for EV internship", "GATE study schedule"].map((item, index) => <div key={item} className={`mb-1 truncate rounded-xl px-3 py-2.5 text-xs ${index === 0 ? "bg-white/[0.06] text-white" : "text-slate-500"}`}>{item}</div>)}
@@ -1104,10 +1104,10 @@ function AIAssistant() {
                   <div className="flex max-w-2xl gap-3">
                     <span className="mt-1 grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 text-white"><Sparkles className="size-4" /></span>
                     <div className="rounded-[1.4rem] rounded-tl-md border border-white/[0.08] bg-white/[0.035] p-5 text-sm leading-7 text-slate-300">
-                      <p><strong className="text-white">KCL</strong> bolta hai: kisi junction par jitna current enter karega, utna hi current exit karega — charge junction par जमा नहीं होता.</p>
-                      <div className="my-4 rounded-xl border border-cyan-300/10 bg-cyan-300/[0.045] px-4 py-3 font-mono text-cyan-200">Σ I<sub>in</sub> = Σ I<sub>out</sub></div>
+                      <p><strong className="text-white">KCL</strong> bolta hai: kisi junction par jitna current enter karega, utna hi current exit karega â€” charge junction par à¤œà¤®à¤¾ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹à¤¤à¤¾.</p>
+                      <div className="my-4 rounded-xl border border-cyan-300/10 bg-cyan-300/[0.045] px-4 py-3 font-mono text-cyan-200">Î£ I<sub>in</sub> = Î£ I<sub>out</sub></div>
                       <p><strong className="text-white">KVL</strong> bolta hai: closed loop ke around sab voltage rises aur drops ka algebraic sum zero hota hai.</p>
-                      <div className="my-4 rounded-xl border border-violet-300/10 bg-violet-300/[0.045] px-4 py-3 font-mono text-violet-200">Σ V = 0</div>
+                      <div className="my-4 rounded-xl border border-violet-300/10 bg-violet-300/[0.045] px-4 py-3 font-mono text-violet-200">Î£ V = 0</div>
                       <p className="text-slate-400">Ready for the practice circuit? I&apos;ll check each step, not just the final answer.</p>
                     </div>
                   </div>
@@ -1127,7 +1127,7 @@ function AIAssistant() {
 
 function DashboardPreview() {
   const activity = [
-    { icon: FolderKanban, label: "Smart Micro-BMS", meta: "Project · 3 new updates", color: "text-emerald-300 bg-emerald-300/10" },
+    { icon: FolderKanban, label: "Smart Micro-BMS", meta: "Project Â· 3 new updates", color: "text-emerald-300 bg-emerald-300/10" },
     { icon: BookOpen, label: "Power Systems Notes", meta: "Saved by 148 students", color: "text-cyan-300 bg-cyan-300/10" },
     { icon: Trophy, label: "GreenTech Challenge", meta: "Registration closes in 4 days", color: "text-amber-300 bg-amber-300/10" },
   ];
@@ -1178,7 +1178,7 @@ function Testimonials() {
             <Reveal key={testimonial.name} delay={index * 0.08}>
               <motion.article whileHover={{ y: -7 }} className="flex h-full flex-col rounded-[2rem] border border-white/[0.08] bg-white/[0.03] p-7 shadow-[0_25px_80px_rgba(0,0,0,0.24)]">
                 <div className="flex gap-1 text-amber-300" aria-label="5 out of 5 stars">{Array.from({ length: 5 }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}</div>
-                <blockquote className="mt-7 flex-1 text-base leading-8 text-slate-300">“{testimonial.quote}”</blockquote>
+                <blockquote className="mt-7 flex-1 text-base leading-8 text-slate-300">â€œ{testimonial.quote}â€</blockquote>
                 <div className="mt-8 flex items-center gap-3 border-t border-white/[0.07] pt-5"><img src={testimonial.avatar} alt={testimonial.name} className="size-11 rounded-full object-cover" /><div><p className="text-sm font-semibold text-white">{testimonial.name}</p><p className="mt-1 text-xs text-slate-500">{testimonial.role}</p></div></div>
               </motion.article>
             </Reveal>
@@ -1234,10 +1234,10 @@ function FinalCTA() {
           <motion.div animate={{ rotate: [360, 0] }} transition={{ duration: 34, repeat: Infinity, ease: "linear" }} className="absolute -bottom-32 -right-24 size-80 rounded-[42%] border border-violet-300/10 bg-violet-300/[0.03]" />
           <span className="relative mx-auto grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-violet-500 text-white shadow-[0_15px_50px_rgba(34,211,238,0.28)]"><GraduationCap className="size-6" /></span>
           <p className="relative mt-8 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Your next chapter starts here</p>
-          <h2 className="relative mx-auto mt-5 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">The people, knowledge, and opportunities are already here.</h2>
-          <p className="relative mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">Join the student network built to make every semester more connected, more ambitious, and more meaningful.</p>
-          <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"><GlowButton href="#home">Join CampusLoop free</GlowButton><GlowButton href="mailto:campus@campusloop.in" secondary>Bring CampusLoop to your university</GlowButton></div>
-          <p className="relative mt-6 text-xs text-slate-600">Free for students · University email verification · No credit card</p>
+          <h2 className="relative mx-auto mt-5 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">Build better student habits with one focused workspace.</h2>
+          <p className="relative mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">CampusLoop is currently in early beta. Core planning, authentication, and student productivity features are being built step by step.</p>
+          <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"><GlowButton href="/signup">Join CampusLoop free</GlowButton><GlowButton href="mailto:campus@campusloop.in" secondary>Bring CampusLoop to your university</GlowButton></div>
+          <p className="relative mt-6 text-xs text-slate-600">Free for students Â· University email verification Â· No credit card</p>
         </div>
       </Reveal>
     </section>
@@ -1259,7 +1259,7 @@ function Footer() {
           <div className="max-w-sm"><Logo /><p className="mt-5 text-sm leading-6 text-slate-500">The modern student network for learning, building, belonging, and becoming.</p><div className="mt-6 flex gap-2"><a href="https://www.linkedin.com" aria-label="CampusLoop on LinkedIn" className="grid size-9 place-items-center rounded-xl border border-white/[0.08] text-slate-500 transition-colors hover:border-white/[0.15] hover:text-white"><BriefcaseBusiness className="size-4" /></a><a href="https://www.twitter.com" aria-label="CampusLoop on Twitter" className="grid size-9 place-items-center rounded-xl border border-white/[0.08] text-slate-500 transition-colors hover:border-white/[0.15] hover:text-white"><MessageCircleMore className="size-4" /></a><a href="mailto:hello@campusloop.in" aria-label="Email CampusLoop" className="grid size-9 place-items-center rounded-xl border border-white/[0.08] text-slate-500 transition-colors hover:border-white/[0.15] hover:text-white"><Mail className="size-4" /></a></div></div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">{columns.map((column) => <div key={column.title}><h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">{column.title}</h3><ul className="mt-5 space-y-3">{column.links.map(([label, href]) => <li key={label}><a href={href} className="text-sm text-slate-600 transition-colors hover:text-white">{label}</a></li>)}</ul></div>)}</div>
         </div>
-        <div className="flex flex-col gap-4 pt-7 text-xs text-slate-700 sm:flex-row sm:items-center sm:justify-between"><p>© 2026 CampusLoop. Made for ambitious students.</p><div className="flex items-center gap-5"><span className="flex items-center gap-2"><span className="size-1.5 rounded-full bg-emerald-400" /> All systems operational</span><a href="#home" className="transition-colors hover:text-white">Back to top ↑</a></div></div>
+        <div className="flex flex-col gap-4 pt-7 text-xs text-slate-700 sm:flex-row sm:items-center sm:justify-between"><p>Â© 2026 CampusLoop. Made for ambitious students.</p><div className="flex items-center gap-5"><span className="flex items-center gap-2"><span className="size-1.5 rounded-full bg-amber-400" /> Early beta</span><a href="#home" className="transition-colors hover:text-white">Back to top â†‘</a></div></div>
       </div>
     </footer>
   );
@@ -1268,7 +1268,7 @@ function Footer() {
 export default function Home() {
   return (
     <>
-      <title>CampusLoop — The Modern Student Network</title>
+      <title>CampusLoop â€” The Modern Student Network</title>
       <meta name="description" content="CampusLoop connects students with learning resources, communities, projects, hackathons, internships, research, placement preparation, and an intelligent AI study assistant." />
       <meta name="theme-color" content="#050816" />
       <main className="min-h-screen overflow-x-hidden bg-[#050816] font-sans text-white selection:bg-cyan-300 selection:text-slate-950">
@@ -1296,3 +1296,4 @@ export default function Home() {
     </>
   );
 }
+
