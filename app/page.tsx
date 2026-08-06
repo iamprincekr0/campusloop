@@ -51,9 +51,13 @@ import {
 
 const navigation = [
   { label: "Features", href: "#features" },
-  { label: "Campus Life", href: "#campus-life" },
   { label: "Resources", href: "#resources" },
+  {
+    label: "Events",
+    href: "/events/extension-board-2026",
+  },
   { label: "Communities", href: "#communities" },
+  { label: "Projects", href: "#projects" },
 ];
 
 const universities = [
