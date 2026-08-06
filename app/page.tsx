@@ -443,16 +443,37 @@ function HeroVisual() {
 }
 
 function Hero() {
+  const trustPoints = [
+    "Real student accounts",
+    "Privacy-first experience",
+    "Features released gradually",
+  ];
+
   return (
-    <section id="home" className="relative flex min-h-screen items-center overflow-hidden px-5 pb-20 pt-32 sm:px-6 lg:pt-28">
-      <div className="absolute left-[8%] top-[12%] size-[26rem] rounded-full bg-cyan-500/15 blur-[120px]" />
-      <div className="absolute right-[8%] top-[10%] size-[34rem] rounded-full bg-violet-600/15 blur-[150px]" />
+    <section
+      id="home"
+      className="relative flex min-h-screen items-center overflow-hidden px-5 pb-20 pt-32 sm:px-6 lg:pt-28"
+    >
+      {/* Background effects */}
+      <div className="pointer-events-none absolute left-[8%] top-[12%] size-[26rem] rounded-full bg-cyan-500/15 blur-[120px]" />
+
+      <div className="pointer-events-none absolute right-[8%] top-[10%] size-[34rem] rounded-full bg-violet-600/15 blur-[150px]" />
+
       <motion.div
-        animate={{ x: [0, 45, 0], y: [0, -30, 0], scale: [1, 1.08, 1] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[5%] left-[35%] size-72 rounded-full bg-pink-500/10 blur-[120px]"
+        animate={{
+          x: [0, 45, 0],
+          y: [0, -30, 0],
+          scale: [1, 1.08, 1],
+        }}
+        transition={{
+          duration: 14,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="pointer-events-none absolute bottom-[5%] left-[35%] size-72 rounded-full bg-pink-500/10 blur-[120px]"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.022)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.022)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_90%)]" />
+
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.022)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.022)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_90%)]" />
 
       <div className="relative mx-auto grid w-full max-w-7xl items-center gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
         <motion.div
@@ -460,69 +481,132 @@ function Hero() {
           animate="visible"
           variants={{
             hidden: {},
-            visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+            visible: {
+              transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.1,
+              },
+            },
           }}
           className="max-w-2xl"
         >
+          {/* Honest beta badge */}
           <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
             className="mb-7 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.07] px-3.5 py-2 text-xs font-medium text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
           >
-            <Sparkles className="size-3.5 text-cyan-300" />
-            The modern student network
-            <span className="size-1 rounded-full bg-cyan-300" />
-            Built for what&apos;s next
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-amber-300 opacity-70" />
+              <span className="relative inline-flex size-2 rounded-full bg-amber-300" />
+            </span>
+
+            CampusLoop AI OS
+
+            <span className="size-1 rounded-full bg-slate-500" />
+
+            Early Beta
           </motion.div>
+
+          {/* Main heading */}
           <motion.h1
-            variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0 } }}
-            className="text-[clamp(3.25rem,7vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.065em] text-white"
+            variants={{
+              hidden: { opacity: 0, y: 28 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="text-[clamp(3.1rem,7vw,6.3rem)] font-semibold leading-[0.93] tracking-[-0.065em] text-white"
           >
-            Campus life,
+            The AI Operating System
             <span className="mt-2 block bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-              in one loop.
+              for every student.
             </span>
           </motion.h1>
+
+          {/* Product explanation */}
           <motion.p
-            variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+            variants={{
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0 },
+            }}
             className="mt-7 max-w-xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8"
           >
-            Meet your people. Master your courses. Build ambitious projects. Discover the opportunities that shape your future â€” all inside one intelligent campus network.
+            Turn long-term goals into clear daily execution. CampusLoop helps
+            students plan their studies, manage projects, track progress and
+            build consistent habits without wondering what to do next.
           </motion.p>
+
+          {/* CTA buttons */}
           <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
             className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
-            <GlowButton href="/signup">Join CampusLoop free</GlowButton>
-            <GlowButton href="/dashboard" secondary>
-              Explore the experience
+            <GlowButton href="/signup">
+              Start your journey
+            </GlowButton>
+
+            <GlowButton href="/login" secondary>
+              Sign in
             </GlowButton>
           </motion.div>
+
+          {/* Honest trust points */}
           <motion.div
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-            className="mt-10 grid max-w-lg grid-cols-3 divide-x divide-white/10"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+            }}
+            className="mt-10 grid gap-3 sm:grid-cols-3"
           >
-            {[
-              ["Early", "Beta"],
-              ["Real", "Data only"],
-              ["Student-first", "Product"],
-            ].map(([value, label], index) => (
-              <div key={label} className={index === 0 ? "pr-4" : "px-4 sm:px-6"}>
-                <p className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{value}</p>
-                <p className="mt-1 text-xs text-slate-500 sm:text-sm">{label}</p>
+            {trustPoints.map((point) => (
+              <div
+                key={point}
+                className="flex items-center gap-2 rounded-2xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3 text-xs text-slate-400"
+              >
+                <CheckCircle2 className="size-4 shrink-0 text-emerald-300" />
+                <span>{point}</span>
               </div>
             ))}
           </motion.div>
+
+          {/* Product promise */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 16 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="mt-8 flex items-start gap-3 border-l border-cyan-300/30 pl-4"
+          >
+            <Sparkles className="mt-0.5 size-4 shrink-0 text-cyan-300" />
+
+            <p className="max-w-lg text-sm leading-6 text-slate-500">
+              Built as an execution platform—not a normal chatbot, fake social
+              network or another basic to-do application.
+            </p>
+          </motion.div>
         </motion.div>
+
         <HeroVisual />
       </div>
 
       <a
-        href="#universities"
-        aria-label="Scroll to explore CampusLoop"
+        href="#features"
+        aria-label="Explore CampusLoop features"
         className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-slate-500 transition-colors hover:text-white xl:flex"
       >
         Explore
-        <motion.span animate={{ y: [0, 5, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>
+
+        <motion.span
+          animate={{ y: [0, 5, 0] }}
+          transition={{
+            duration: 1.6,
+            repeat: Infinity,
+          }}
+        >
           <ChevronDown className="size-4" />
         </motion.span>
       </a>
