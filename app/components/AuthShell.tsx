@@ -1,0 +1,17 @@
+import Link from "next/link";
+import { ReactNode } from "react";
+import { ArrowRight, CalendarDays, Check, FolderKanban, GraduationCap, Sparkles, Users } from "lucide-react";
+
+type AuthShellProps = {
+  children: ReactNode;
+  eyebrow: string;
+  title: string;
+  description: string;
+  benefits: string[];
+};
+
+export default function AuthShell({ children, eyebrow, title, description, benefits }: AuthShellProps) {
+  return <main className="min-h-screen bg-[#f7f8fc] text-slate-950"><div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"><div className="absolute -left-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-blue-200/45 blur-[110px]" /><div className="absolute bottom-[-14rem] right-[-10rem] h-[38rem] w-[38rem] rounded-full bg-violet-100/80 blur-[130px]" /></div><div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[.95fr_1.05fr]"><section className="hidden border-r border-slate-200/70 px-10 py-10 lg:flex lg:flex-col xl:px-16"><Link href="/" className="inline-flex items-center gap-3 self-start"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/25"><GraduationCap className="h-5 w-5" /></span><span className="text-xl font-bold tracking-[-0.05em]">Campus<span className="text-blue-600">Loop</span></span></Link><div className="my-auto max-w-lg"><span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700"><Sparkles className="h-3.5 w-3.5" /> {eyebrow}</span><h1 className="mt-7 text-5xl font-bold leading-[1.02] tracking-[-0.065em] text-slate-950 xl:text-6xl">{title}</h1><p className="mt-6 max-w-md text-base leading-7 text-slate-600">{description}</p><ul className="mt-9 space-y-3">{benefits.map((benefit) => <li key={benefit} className="flex items-center gap-3 text-sm font-semibold text-slate-700"><span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-100 text-emerald-600"><Check className="h-3.5 w-3.5" /></span>{benefit}</li>)}</ul><div className="mt-10 rounded-[28px] border border-white bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)]"><div className="rounded-2xl bg-slate-950 p-5 text-white"><div className="flex items-center justify-between"><span className="text-xs font-bold text-blue-200">Your student workspace</span><span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10"><Sparkles className="h-4 w-4" /></span></div><p className="mt-5 text-xl font-bold tracking-tight">Everything, in its place.</p><div className="mt-5 grid grid-cols-3 gap-2"><PreviewCard icon={Users} label="People" value="3.2K" /><PreviewCard icon={CalendarDays} label="Events" value="12" /><PreviewCard icon={FolderKanban} label="Projects" value="42" /></div></div></div></div><p className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">Built for students, teams, and real progress <ArrowRight className="h-3.5 w-3.5" /></p></section><section className="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8 lg:px-12">{children}</section></div></main>;
+}
+
+function PreviewCard({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: string }) { return <div className="rounded-xl bg-white/[0.09] p-3"><Icon className="h-3.5 w-3.5 text-blue-200" /><p className="mt-3 text-sm font-bold">{value}</p><p className="mt-0.5 text-[9px] text-slate-300">{label}</p></div>; }
