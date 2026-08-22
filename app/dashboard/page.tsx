@@ -8,7 +8,6 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarDays,
-  CheckCircle2,
   ChevronRight,
   CircleUserRound,
   FolderKanban,
@@ -32,7 +31,13 @@ type DashboardUser = {
   fullName: string;
 };
 
-
+const upcomingEvent = {
+  title: "Extension Board 2026",
+  date: "24 Aug 2026",
+  venue: "CampusLoop Event",
+  description:
+    "Join the upcoming Extension Board event and participate with other students.",
+};
 
 const opportunities = [
   {
@@ -204,12 +209,8 @@ export default function DashboardPage() {
             },
           }}
         >
-          <CampusPulse
-            fullName={user.fullName}
-            profileComplete={false}
-            hasProjects={false}
-            hasRegistrations={false}
-          />
+          {/* PERSONALIZED CAMPUS PULSE */}
+          <CampusPulse fullName={user.fullName} />
 
           {/* HERO */}
           <motion.section
