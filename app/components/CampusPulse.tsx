@@ -1,231 +1,216 @@
 ﻿"use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  Sparkles,
-  Sun,
-} from "lucide-react";
+import { Sparkles, Sun, Star } from "lucide-react";
 
 type CampusPulseProps = {
   fullName: string;
-  profileComplete?: boolean;
-  hasProjects?: boolean;
-  hasRegistrations?: boolean;
 };
 
 type FestivalConfig = {
-  id: string;
   title: string;
   message: string;
   start: string;
   end: string;
-  icon: string;
-  accent: string;
+  emoji: string;
+  gradient: string;
 };
 
 const FESTIVALS: FestivalConfig[] = [
   {
-    id: "ganesh-chaturthi-2026",
     title: "Happy Ganesh Chaturthi",
     message:
       "May this new beginning bring clarity, courage and great things to build.",
     start: "2026-09-14",
     end: "2026-09-25",
-    icon: "🙏",
-    accent: "from-orange-500 via-pink-500 to-violet-600",
+    emoji: "🙏",
+    gradient: "from-orange-400 via-pink-500 to-violet-600",
   },
 ];
 
-const MOTIVATIONS = [
-  "One meaningful step today is better than ten plans for tomorrow.",
-  "Keep learning. Keep building. Your next breakthrough can start today.",
-  "Small progress compounds. Make today's move count.",
-  "Your campus journey is being built one decision at a time.",
-  "Do not wait for the perfect moment. Build the next step.",
+const DAILY_MESSAGES = [
+  "Your campus is moving. Make your next move meaningful.",
+  "One focused step today can change where you are tomorrow.",
+  "Keep learning. Keep building. Keep moving forward.",
+  "Your next opportunity can start with one small action today.",
+  "Build something you will be proud to look back on.",
+  "Great journeys are built from consistent small wins.",
+  "You do not need to do everything today. Just do the next right thing.",
 ];
 
 function getGreeting(hour: number) {
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  if (hour < 21) return "Good evening";
+  if (hour >= 5 && hour < 12) return "Good morning";
+  if (hour >= 12 && hour < 17) return "Good afternoon";
+  if (hour >= 17 && hour < 21) return "Good evening";
   return "Welcome back";
 }
 
-function getTodayKey() {
-  const today = new Date();
-  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(today.getDate()).padStart(2, "0")}`;
+function getLocalDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
-function getActiveFestival(today: string) {
+function getDailyMessage(date: Date) {
+  const start = new Date(date.getFullYear(), 0, 1);
+  const dayOfYear =
+    Math.floor(
+      (date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+    ) + 1;
+
+  return DAILY_MESSAGES[(dayOfYear - 1) % DAILY_MESSAGES.length];
+}
+
+function getActiveFestival(date: Date) {
+  const dateKey = getLocalDateKey(date);
+
   return FESTIVALS.find(
-    (festival) => today >= festival.start && today <= festival.end
+    (festival) =>
+      dateKey >= festival.start &&
+      dateKey <= festival.end
   );
 }
 
 export default function CampusPulse({
   fullName,
-  profileComplete = false,
-  hasProjects = false,
-  hasRegistrations = false,
 }: CampusPulseProps) {
-  const pulse = useMemo(() => {
-    const now = new Date();
-    const today = getTodayKey();
-    const festival = getActiveFestival(today);
-    const name = fullName.trim().split(/\s+/)[0] || "Student";
-    const greeting = getGreeting(now.getHours());
+  const [now, setNow] = useState<Date | null>(null);
 
-    const dayIndex = Math.floor(
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-      ).getTime() / 86400000
-    );
-
-    let action: {
-      label: string;
-      href: string;
-      icon: typeof CheckCircle2;
-    } = {
-      label: "Complete your profile",
-      href: "/profile",
-      icon: CheckCircle2,
+  useEffect(() => {
+    const updateTime = () => {
+      setNow(new Date());
     };
 
-    if (hasRegistrations) {
-      action = {
-        label: "Check your registrations",
-        href: "/events/extension-board-2026",
-        icon: CalendarDays,
-      };
-    } else if (hasProjects) {
-      action = {
-        label: "Continue your project",
-        href: "/projects",
-        icon: ArrowRight,
-      };
-    } else if (profileComplete) {
-      action = {
-        label: "Discover what is next",
-        href: "/events/extension-board-2026",
-        icon: Sparkles,
-      };
-    }
+    updateTime();
+
+    const timer = window.setInterval(updateTime, 60_000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const pulse = useMemo(() => {
+    if (!now) return null;
+
+    const firstName =
+      fullName.trim().split(/\s+/)[0] || "Student";
+
+    const festival = getActiveFestival(now);
 
     return {
-      name,
-      greeting,
+      firstName,
+      greeting: getGreeting(now.getHours()),
+      motivation: getDailyMessage(now),
       festival,
-      motivation:
-        MOTIVATIONS[Math.abs(dayIndex) % MOTIVATIONS.length],
-      action,
-      dateText: now.toLocaleDateString("en-IN", {
-        weekday: "long",
-        day: "numeric",
-        month: "short",
-      }),
     };
-  }, [fullName, profileComplete, hasProjects, hasRegistrations]);
+  }, [fullName, now]);
 
-  const ActionIcon = pulse.action.icon;
+  if (!pulse) {
+    return (
+      <div className="mb-6 h-[150px] animate-pulse rounded-[28px] bg-slate-100" />
+    );
+  }
 
   return (
     <motion.section
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative mb-6 overflow-hidden rounded-[28px] border p-5 shadow-sm sm:p-6 ${
-        pulse.festival
-          ? "border-orange-200 bg-white"
-          : "border-slate-200/80 bg-white"
-      }`}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="relative mb-6 overflow-hidden rounded-[30px] border border-slate-200/70 bg-white shadow-[0_14px_45px_rgba(15,23,42,0.06)]"
     >
+      {/* ambient glow */}
+      <div
+        className={`pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl ${
+          pulse.festival
+            ? "bg-orange-300/20"
+            : "bg-blue-300/15"
+        }`}
+      />
+
+      <div
+        className={`pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full blur-3xl ${
+          pulse.festival
+            ? "bg-violet-300/15"
+            : "bg-cyan-300/10"
+        }`}
+      />
+
+      {/* festival top accent */}
       {pulse.festival && (
-        <>
-          <div
-            className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${pulse.festival.accent}`}
-          />
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-orange-300/15 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-violet-300/10 blur-3xl" />
-        </>
+        <div
+          className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${pulse.festival.gradient}`}
+        />
       )}
 
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
-        <div
-          className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${
-            pulse.festival
-              ? "bg-gradient-to-br from-orange-100 to-pink-100 text-2xl"
-              : "bg-blue-50 text-blue-600"
-          }`}
-        >
-          {pulse.festival ? (
-            pulse.festival.icon
-          ) : (
-            <Sun className="h-6 w-6" />
-          )}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-blue-600">
-              {pulse.dateText}
-            </span>
-
-            {pulse.festival && (
-              <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-orange-700">
-                Special day
+      <div className="relative px-6 py-7 sm:px-8 sm:py-8">
+        <div className="flex items-start gap-4">
+          <div
+            className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${
+              pulse.festival
+                ? "bg-gradient-to-br from-orange-100 to-pink-100 text-2xl"
+                : "bg-blue-50 text-blue-600"
+            }`}
+          >
+            {pulse.festival ? (
+              <span aria-hidden="true">
+                {pulse.festival.emoji}
               </span>
+            ) : (
+              <Sun className="h-5 w-5" />
             )}
           </div>
 
-          <h2 className="mt-2 text-xl font-bold tracking-[-0.03em] text-slate-900 sm:text-2xl">
-            {pulse.greeting}, {pulse.name}{" "}
-            <span aria-hidden="true">
-              {pulse.festival ? "🙏" : "👋"}
-            </span>
-          </h2>
-
-          {pulse.festival ? (
-            <>
-              <p className="mt-2 text-sm font-semibold text-slate-700">
-                {pulse.festival.title}
-              </p>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-                {pulse.festival.message}
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              {pulse.motivation}
-            </p>
-          )}
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-500">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-blue-500" />
-              CampusPulse
-            </span>
 
-            <span className="text-xs leading-7 text-slate-400">
-              Your CampusLoop experience adapts to your journey.
-            </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                CampusPulse
+              </span>
+
+              {pulse.festival && (
+                <>
+                  <span className="h-1 w-1 rounded-full bg-slate-300" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-600">
+                    Special day
+                  </span>
+                </>
+              )}
+            </div>
+
+            <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em] text-slate-950 sm:text-3xl">
+              {pulse.greeting}, {pulse.firstName}.
+            </h2>
+
+            {pulse.festival ? (
+              <>
+                <p className="mt-2 text-sm font-bold text-slate-800 sm:text-base">
+                  {pulse.festival.title} {pulse.festival.emoji}
+                </p>
+
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                  {pulse.festival.message}
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+                {pulse.motivation}
+              </p>
+            )}
           </div>
-        </div>
 
-        <a
-          href={pulse.action.href}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-600"
-        >
-          <ActionIcon className="h-4 w-4" />
-          {pulse.action.label}
-        </a>
+          <Star
+            className={`hidden h-4 w-4 shrink-0 sm:block ${
+              pulse.festival
+                ? "text-orange-400"
+                : "text-slate-200"
+            }`}
+          />
+        </div>
       </div>
     </motion.section>
   );

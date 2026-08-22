@@ -32,13 +32,7 @@ type DashboardUser = {
   fullName: string;
 };
 
-const upcomingEvent = {
-  title: "Extension Board 2026",
-  date: "24 Aug 2026",
-  venue: "CampusLoop Event",
-  description:
-    "Join the upcoming Extension Board event and participate with other students.",
-};
+
 
 const opportunities = [
   {
