@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+
 import {
   ArrowRight,
+  BookOpen,
   BriefcaseBusiness,
   CalendarDays,
   CheckCircle2,
   ChevronRight,
   CircleUserRound,
   FolderKanban,
-  GraduationCap,
   Lightbulb,
+  Network,
   Plus,
   Sparkles,
   Target,
@@ -21,16 +24,10 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import AppShell from "../components/AppShell";
+import CampusPulse from "../components/CampusPulse";
 import { supabase } from "../../lib/supabase";
-
-type DashboardUser = {
-  id: string;
-  email: string;
-  fullName: string;
-};
 
 const upcomingEvent = {
   title: "Extension Board 2026",
