@@ -4,10 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-
 import {
   ArrowRight,
-  BookOpen,
   BriefcaseBusiness,
   CalendarDays,
   CheckCircle2,
@@ -15,7 +13,6 @@ import {
   CircleUserRound,
   FolderKanban,
   Lightbulb,
-  Network,
   Plus,
   Sparkles,
   Target,
@@ -28,6 +25,12 @@ import {
 import AppShell from "../components/AppShell";
 import CampusPulse from "../components/CampusPulse";
 import { supabase } from "../../lib/supabase";
+
+type DashboardUser = {
+  id: string;
+  email: string;
+  fullName: string;
+};
 
 const upcomingEvent = {
   title: "Extension Board 2026",
@@ -207,6 +210,13 @@ export default function DashboardPage() {
             },
           }}
         >
+          <CampusPulse
+            fullName={user.fullName}
+            profileComplete={false}
+            hasProjects={false}
+            hasRegistrations={false}
+          />
+
           {/* HERO */}
           <motion.section
             variants={reveal}
@@ -253,7 +263,7 @@ export default function DashboardPage() {
               <div className="rounded-3xl border border-white/10 bg-white/[0.07] p-5 backdrop-blur">
                 <div className="flex items-center gap-3">
                   <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/10">
-                    <GraduationCap className="h-5 w-5 text-blue-200" />
+                    <CircleUserRound className="h-5 w-5 text-blue-200" />
                   </span>
 
                   <div>
@@ -319,7 +329,7 @@ export default function DashboardPage() {
             />
           </motion.section>
 
-          {/* EVENT + REGISTRATIONS */}
+          {/* EVENTS + REGISTRATIONS */}
           <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
             <motion.section
               variants={reveal}
@@ -405,31 +415,30 @@ export default function DashboardPage() {
               href="/projects"
             />
 
-            <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]">
-              <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-orange-50 text-orange-600">
-                    <FolderKanban className="h-6 w-6" />
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="font-bold text-slate-900">
-                      Your project space is empty
-                    </h3>
-                    <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-                      Add a project to showcase your skills, find teammates and
-                      make your work discoverable.
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/projects/new"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-600"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Create project
-                  </Link>
+            <div className="mt-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6">
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-orange-50 text-orange-600">
+                  <FolderKanban className="h-6 w-6" />
                 </div>
+
+                <div className="flex-1">
+                  <h3 className="font-bold text-slate-900">
+                    Your project space is empty
+                  </h3>
+
+                  <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                    Add a project to showcase your skills, find teammates and
+                    make your work discoverable.
+                  </p>
+                </div>
+
+                <Link
+                  href="/projects/new"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-600"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create project
+                </Link>
               </div>
             </div>
           </motion.section>
@@ -462,7 +471,7 @@ export default function DashboardPage() {
             <SectionHeading
               eyebrow="Start here"
               title="Quick actions"
-              action=" "
+              action=""
             />
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -485,6 +494,7 @@ export default function DashboardPage() {
                       <span className="block text-sm font-bold text-slate-800">
                         {item.title}
                       </span>
+
                       <span className="mt-1 block text-xs leading-5 text-slate-500">
                         {item.description}
                       </span>
@@ -497,7 +507,7 @@ export default function DashboardPage() {
             </div>
           </motion.section>
 
-          {/* EMPTY GARDEN / NEXT STEP */}
+          {/* NEXT MOVE */}
           <motion.section
             variants={reveal}
             className="mt-6 rounded-[28px] border border-slate-200/80 bg-slate-950 p-6 text-white shadow-sm sm:p-8"
@@ -510,13 +520,12 @@ export default function DashboardPage() {
                 </div>
 
                 <h2 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
-                  CampusLoop becomes more useful as you build your profile.
+                  Build your CampusLoop journey one useful step at a time.
                 </h2>
 
                 <p className="mt-3 text-sm leading-6 text-slate-400">
-                  Add your education, skills and first project. These details
-                  will eventually power better recommendations for events,
-                  teammates and opportunities.
+                  Add your education, skills and first project to unlock better
+                  recommendations later.
                 </p>
               </div>
 
@@ -558,7 +567,7 @@ function SectionHeading({
         </h2>
       </div>
 
-      {action.trim() &&
+      {action &&
         (href ? (
           <Link
             href={href}
