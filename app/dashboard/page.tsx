@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CalendarDays,
+  CheckCircle2,
+  Circle,
   Compass,
   ExternalLink,
   FolderKanban,
@@ -23,6 +25,13 @@ import { supabase } from "../../lib/supabase";
 /* ─── types ─── */
 
 type User = { id: string; fullName: string; email: string };
+
+type ProfileData = {
+  skills: string[] | null;
+  bio: string | null;
+  resume_url: string | null;
+  avatar_url: string | null;
+};
 
 type EventRow = {
   id: string;
@@ -43,6 +52,14 @@ type ProjectRow = {
   live_url: string | null;
 };
 
+type ChecklistItem = {
+  id: string;
+  label: string;
+  completed: boolean;
+  href: string;
+  cta: string;
+};
+
 /* ─── helpers ─── */
 
 function formatEventDate(dateStr: string) {
@@ -58,6 +75,7 @@ function formatEventDate(dateStr: string) {
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +103,18 @@ export default function DashboardPage() {
         email: authUser.email ?? "",
       });
 
-      /* 2 — upcoming events (published, any date — server knows what's relevant) */
+      /* 2 — profile stats check */
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("skills, bio, resume_url, avatar_url")
+        .eq("id", authUser.id)
+        .single();
+
+      if (active && profileData) {
+        setProfile(profileData as ProfileData);
+      }
+
+      /* 3 — upcoming events */
       const { data: eventsData } = await supabase
         .from("events")
         .select(
@@ -97,7 +126,7 @@ export default function DashboardPage() {
 
       if (active && eventsData) setEvents(eventsData as EventRow[]);
 
-      /* 3 — user's projects */
+      /* 4 — user's projects */
       const { data: projectsData } = await supabase
         .from("projects")
         .select("id,title,description,tech_stack,github_url,live_url")
@@ -137,6 +166,49 @@ export default function DashboardPage() {
     router.replace("/login");
     router.refresh();
   }
+
+  // Actionable dynamic checklist for student guidance
+  const checklist = useMemo<ChecklistItem[]>(() => {
+    const list: ChecklistItem[] = [];
+
+    // 1. Projects check
+    list.push({
+      id: "projects",
+      label: "Showcase a project to highlight your skills",
+      completed: projects.length > 0,
+      href: "/projects/new",
+      cta: "Add project",
+    });
+
+    // 2. Profile Photo
+    list.push({
+      id: "avatar",
+      label: "Upload a profile photo for peers and recruiters",
+      completed: !!profile?.avatar_url,
+      href: "/profile",
+      cta: "Upload photo",
+    });
+
+    // 3. Resume
+    list.push({
+      id: "resume",
+      label: "Upload a resume PDF to prepare for matching",
+      completed: !!profile?.resume_url,
+      href: "/profile",
+      cta: "Upload resume",
+    });
+
+    // 4. Skills & Bio
+    list.push({
+      id: "skills_bio",
+      label: "Add technical skills and a brief bio",
+      completed: !!(profile?.bio && profile?.skills && profile.skills.length > 0),
+      href: "/profile",
+      cta: "Update profile",
+    });
+
+    return list;
+  }, [projects, profile]);
 
   /* loading state */
   if (loading || !user) {
@@ -319,6 +391,43 @@ export default function DashboardPage() {
 
           {/* ─ right column ─ */}
           <div className="space-y-6">
+            {/* what should i do next? Checklist */}
+            <DashboardSection title="What should I do next?" icon={CheckCircle2}>
+              <div className="space-y-4">
+                {checklist.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50"
+                  >
+                    {item.completed ? (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-slate-300 shrink-0 mt-0.5" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={`text-sm font-medium leading-relaxed ${
+                          item.completed
+                            ? "text-slate-400 line-through"
+                            : "text-slate-700"
+                        }`}
+                      >
+                        {item.label}
+                      </p>
+                      {!item.completed && (
+                        <Link
+                          href={item.href}
+                          className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800"
+                        >
+                          {item.cta} <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </DashboardSection>
+
             {/* campus intelligence promo */}
             <div className="rounded-[28px] bg-gradient-to-br from-slate-950 to-slate-800 p-6 text-white shadow-xl shadow-slate-900/10">
               <span className="inline-flex rounded-xl bg-white/10 p-2.5 text-blue-200">
@@ -353,19 +462,6 @@ export default function DashboardPage() {
                   value={events.length}
                   href="/events/extension-board-2026"
                 />
-              </div>
-              <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 px-4 py-4 text-center">
-                <p className="text-xs leading-5 text-slate-500">
-                  Complete your profile to unlock personalized
-                  recommendations.
-                </p>
-                <Link
-                  href="/profile"
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800"
-                >
-                  Complete profile{" "}
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
               </div>
             </DashboardSection>
           </div>

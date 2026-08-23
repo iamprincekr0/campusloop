@@ -5,10 +5,12 @@ import {
   ChangeEvent,
   FormEvent,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import AppShell from "../components/AppShell";
 
 type ProfileForm = {
   full_name: string;
@@ -54,6 +56,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -113,6 +116,28 @@ export default function ProfilePage() {
     loadProfile();
   }, [router]);
 
+  const initials = useMemo(
+    () =>
+      form.full_name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0]?.toUpperCase())
+        .join("") || "S",
+    [form.full_name]
+  );
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setLoggingOut(false);
+      return;
+    }
+    router.replace("/login");
+    router.refresh();
+  }
+
   function updateField(
     field: keyof ProfileForm,
     value: string
@@ -141,12 +166,12 @@ export default function ProfilePage() {
     if (!file || !userId) return;
 
     if (!file.type.startsWith("image/")) {
-      showError("Sirf image file upload karo.");
+      showError("Please upload an image file only.");
       return;
     }
 
     if (file.size > 3 * 1024 * 1024) {
-      showError("Profile image maximum 3 MB honi chahiye.");
+      showError("Profile image must be under 3 MB.");
       return;
     }
 
@@ -209,12 +234,12 @@ export default function ProfilePage() {
     if (!file || !userId) return;
 
     if (file.type !== "application/pdf") {
-      showError("Resume sirf PDF format me upload karo.");
+      showError("Resume must be in PDF format.");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      showError("Resume maximum 5 MB hona chahiye.");
+      showError("Resume must be under 5 MB.");
       return;
     }
 
@@ -311,18 +336,12 @@ export default function ProfilePage() {
     showSuccess("Profile successfully saved.");
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace("/login");
-    router.refresh();
-  }
-
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050816] text-white">
+      <main className="grid min-h-screen place-items-center bg-[#f7f8fc]">
         <div className="text-center">
-          <div className="mx-auto h-11 w-11 animate-spin rounded-full border-4 border-white/10 border-t-blue-500" />
-          <p className="mt-4 text-sm text-slate-400">
+          <div className="mx-auto h-11 w-11 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <p className="mt-4 text-sm font-medium text-slate-500">
             Loading profile...
           </p>
         </div>
@@ -331,54 +350,24 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050816]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-3"
-          >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 font-bold">
-              C
-            </span>
-
-            <div>
-              <p className="font-bold">CampusLoop</p>
-              <p className="text-xs text-slate-500">
-                Student Growth Network
-              </p>
-            </div>
-          </Link>
-
-          <div className="flex gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-xl border border-white/10 px-4 py-2 text-sm transition hover:bg-white/5"
-            >
-              Dashboard
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300 transition hover:bg-red-500/20"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-6xl px-5 py-10">
+    <AppShell
+      fullName={form.full_name}
+      email={form.email}
+      initials={initials}
+      onLogout={handleLogout}
+      loggingOut={loggingOut}
+    >
+      <section className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10">
         <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-400">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-600">
             Account settings
           </p>
 
-          <h1 className="mt-3 text-4xl font-bold">
+          <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-slate-950 sm:text-4xl">
             Build Your Profile
           </h1>
 
-          <p className="mt-3 text-slate-400">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
             Complete your details to receive better student,
             project and internship matches.
           </p>
@@ -388,8 +377,8 @@ export default function ProfilePage() {
           <div
             className={`mb-6 rounded-2xl border px-5 py-4 text-sm ${
               isError
-                ? "border-red-500/30 bg-red-500/10 text-red-300"
-                : "border-green-500/30 bg-green-500/10 text-green-300"
+                ? "border-red-200 bg-red-50 text-red-800"
+                : "border-green-200 bg-green-50 text-green-800"
             }`}
           >
             {message}
@@ -400,9 +389,9 @@ export default function ProfilePage() {
           onSubmit={handleSubmit}
           className="grid gap-6 lg:grid-cols-[340px_1fr]"
         >
-          <aside className="h-fit rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          <aside className="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="text-center">
-              <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-white/10 bg-gradient-to-br from-blue-500 to-purple-600 text-4xl font-bold">
+              <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-slate-100 bg-gradient-to-br from-blue-500 to-purple-600 text-white text-4xl font-bold">
                 {form.avatar_url ? (
                   <img
                     src={form.avatar_url}
@@ -415,7 +404,7 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <h2 className="mt-5 text-xl font-bold">
+              <h2 className="mt-5 text-xl font-bold text-slate-900">
                 {form.full_name || "Student"}
               </h2>
 
@@ -424,7 +413,7 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <label className="mt-6 block cursor-pointer rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 text-center text-sm font-semibold transition hover:scale-[1.02]">
+            <label className="mt-6 block cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.02] shadow-sm">
               {uploadingAvatar
                 ? "Uploading Photo..."
                 : "Upload Profile Photo"}
@@ -438,14 +427,14 @@ export default function ProfilePage() {
               />
             </label>
 
-            <p className="mt-2 text-center text-xs text-slate-500">
+            <p className="mt-2 text-center text-xs text-slate-400">
               JPG, PNG or WEBP · Maximum 3 MB
             </p>
 
-            <div className="mt-7 border-t border-white/10 pt-6">
-              <label className="block cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-semibold transition hover:bg-white/10">
+            <div className="mt-7 border-t border-slate-100 pt-6">
+              <label className="block cursor-pointer rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
                 {uploadingResume
-                  ? "Uploading Resume..."
+                  ? "Uploading..."
                   : form.resume_url
                     ? "Replace Resume"
                     : "Upload Resume PDF"}
@@ -464,19 +453,19 @@ export default function ProfilePage() {
                   href={form.resume_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 block text-center text-sm font-semibold text-blue-400"
+                  className="mt-3 block text-center text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
                   View uploaded resume
                 </a>
               )}
 
-              <p className="mt-2 text-center text-xs text-slate-500">
+              <p className="mt-2 text-center text-xs text-slate-400">
                 PDF only · Maximum 5 MB
               </p>
             </div>
           </aside>
 
-          <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:p-8">
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
             <div className="grid gap-5 md:grid-cols-2">
               <InputField
                 label="Full Name"
@@ -524,7 +513,7 @@ export default function ProfilePage() {
               />
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-300">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
                   Current Year
                 </label>
 
@@ -533,7 +522,7 @@ export default function ProfilePage() {
                   onChange={(event) =>
                     updateField("year", event.target.value)
                   }
-                  className="w-full rounded-xl border border-white/10 bg-[#101425] px-4 py-3 outline-none focus:border-blue-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none focus:border-blue-500 focus:bg-white text-sm"
                 >
                   <option value="">Select year</option>
                   <option value="1st Year">1st Year</option>
@@ -564,7 +553,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-5">
-              <label className="mb-2 block text-sm font-medium text-slate-300">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 About / Bio
               </label>
 
@@ -576,16 +565,16 @@ export default function ProfilePage() {
                 rows={5}
                 maxLength={500}
                 placeholder="Tell students and recruiters about your interests, projects and goals..."
-                className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none placeholder:text-slate-600 focus:border-blue-500"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white text-sm"
               />
 
-              <p className="mt-1 text-right text-xs text-slate-500">
+              <p className="mt-1 text-right text-xs text-slate-400">
                 {form.bio.length}/500
               </p>
             </div>
 
-            <div className="mt-8 border-t border-white/10 pt-7">
-              <h3 className="text-lg font-bold">
+            <div className="mt-8 border-t border-slate-100 pt-7">
+              <h3 className="text-lg font-bold text-slate-900">
                 Professional Links
               </h3>
 
@@ -622,10 +611,10 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col-reverse gap-3 border-t border-white/10 pt-6 sm:flex-row sm:justify-end">
+            <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
               <Link
                 href="/dashboard"
-                className="rounded-xl border border-white/10 px-6 py-3 text-center font-semibold transition hover:bg-white/5"
+                className="rounded-xl border border-slate-200 px-6 py-3 text-center font-semibold text-slate-700 hover:bg-slate-50 transition"
               >
                 Cancel
               </Link>
@@ -633,7 +622,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-7 py-3 font-semibold transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/10"
               >
                 {saving ? "Saving Profile..." : "Save Profile"}
               </button>
@@ -641,7 +630,7 @@ export default function ProfilePage() {
           </section>
         </form>
       </section>
-    </main>
+    </AppShell>
   );
 }
 
@@ -664,7 +653,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-slate-300">
+      <label className="mb-2 block text-sm font-medium text-slate-700">
         {label}
       </label>
 
@@ -675,7 +664,7 @@ function InputField({
         disabled={disabled}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none placeholder:text-slate-600 focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-855 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white disabled:cursor-not-allowed disabled:opacity-60 text-sm"
       />
     </div>
   );

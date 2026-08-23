@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -19,13 +19,76 @@ type FestivalConfig = {
 
 const FESTIVALS: FestivalConfig[] = [
   {
+    title: "Happy Republic Day",
+    message: "Reflecting on our constitution and building a smarter nation together.",
+    start: "2026-01-25",
+    end: "2026-01-27",
+    emoji: "🇮🇳",
+    gradient: "from-orange-500 via-white to-green-500",
+  },
+  {
+    title: "Happy Holi",
+    message: "Wishing you a bright, colorful, and energetic semester ahead!",
+    start: "2026-03-02",
+    end: "2026-03-04",
+    emoji: "🎨",
+    gradient: "from-pink-400 via-yellow-300 to-cyan-400",
+  },
+  {
+    title: "Happy Independence Day",
+    message: "Celebrating freedom, innovation, and the power of student building.",
+    start: "2026-08-14",
+    end: "2026-08-16",
+    emoji: "🇮🇳",
+    gradient: "from-orange-500 via-white to-green-500",
+  },
+  {
+    title: "Happy Teacher's Day",
+    message: "Thanking the educators and mentors guiding us toward our next big steps.",
+    start: "2026-09-04",
+    end: "2026-09-06",
+    emoji: "🍎",
+    gradient: "from-blue-400 via-indigo-500 to-purple-600",
+  },
+  {
     title: "Happy Ganesh Chaturthi",
-    message:
-      "May this new beginning bring clarity, courage and great things to build.",
+    message: "May this new beginning bring clarity, courage, and progress to your journey.",
     start: "2026-09-14",
     end: "2026-09-25",
     emoji: "🙏",
     gradient: "from-orange-400 via-pink-500 to-violet-600",
+  },
+  {
+    title: "Happy Engineer's Day",
+    message: "Celebrating the builders, problem solvers, and engineers shaping our future.",
+    start: "2026-09-14",
+    end: "2026-09-16",
+    emoji: "⚙️",
+    gradient: "from-slate-700 via-slate-800 to-slate-950",
+  },
+  {
+    title: "Happy Diwali",
+    message: "May the festival of lights bring prosperity, learning, and success to you.",
+    start: "2026-11-07",
+    end: "2026-11-10",
+    emoji: "🪔",
+    gradient: "from-yellow-500 via-orange-500 to-red-600",
+  },
+  {
+    title: "Mid-Semester Exams",
+    message: "Stay focused, take breaks, and tackle one problem statement at a time. You've got this!",
+    start: "2026-10-12",
+    end: "2026-10-17",
+    emoji: "📝",
+    gradient: "from-blue-600 via-violet-600 to-indigo-700",
+  },
+  {
+    title: "End-Semester Exams",
+    message: "The final stretch of the semester. Keep your focus sharp and finish strong!",
+    start: "2026-12-07",
+    end: "2026-12-19",
+    emoji: "🎓",
+    gradient: "from-indigo-600 via-blue-600 to-slate-900",
   },
 ];
 

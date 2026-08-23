@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
+import AppShell from "../../components/AppShell";
+
+type User = { id: string; fullName: string; email: string };
 
 export default function NewProjectPage() {
   const router = useRouter();
 
-  const [userId, setUserId] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [techStack, setTechStack] = useState("");
@@ -17,32 +20,59 @@ export default function NewProjectPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
       const {
-        data: { user },
+        data: { user: authUser },
         error,
       } = await supabase.auth.getUser();
 
-      if (error || !user) {
+      if (error || !authUser) {
         router.replace("/login");
         return;
       }
 
-      setUserId(user.id);
+      setUser({
+        id: authUser.id,
+        fullName: authUser.user_metadata?.full_name ?? "Student",
+        email: authUser.email ?? "",
+      });
       setLoading(false);
     }
 
     loadUser();
   }, [router]);
 
+  const initials = useMemo(
+    () =>
+      user?.fullName
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0]?.toUpperCase())
+        .join("") || "S",
+    [user]
+  );
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setLoggingOut(false);
+      return;
+    }
+    router.replace("/login");
+    router.refresh();
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!userId) return;
+    if (!user) return;
 
     setSaving(true);
     setMessage("");
@@ -53,7 +83,7 @@ export default function NewProjectPage() {
       .filter(Boolean);
 
     const { error } = await supabase.from("projects").insert({
-      user_id: userId,
+      user_id: user.id,
       title: title.trim(),
       description: description.trim(),
       tech_stack: skills,
@@ -79,12 +109,12 @@ export default function NewProjectPage() {
     }, 700);
   }
 
-  if (loading) {
+  if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050816] text-white">
+      <main className="grid min-h-screen place-items-center bg-[#f7f8fc]">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-blue-500" />
-          <p className="mt-4 text-sm text-slate-400">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <p className="mt-4 text-sm font-medium text-slate-500">
             Loading project form...
           </p>
         </div>
@@ -93,37 +123,36 @@ export default function NewProjectPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050816] px-5 py-10 text-white">
-      <div className="mx-auto max-w-3xl">
+    <AppShell
+      fullName={user.fullName}
+      email={user.email}
+      initials={initials}
+      onLogout={handleLogout}
+      loggingOut={loggingOut}
+    >
+      <section className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-400">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-600">
               Project Portfolio
             </p>
 
-            <h1 className="mt-3 text-4xl font-bold">
+            <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-slate-950 sm:text-4xl">
               Add New Project
             </h1>
 
-            <p className="mt-2 text-slate-400">
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
               Showcase your technical work to students and recruiters.
             </p>
           </div>
-
-          <Link
-            href="/dashboard"
-            className="rounded-xl border border-white/10 px-4 py-2 text-sm transition hover:bg-white/5"
-          >
-            Dashboard
-          </Link>
         </div>
 
         {message && (
           <div
             className={`mb-6 rounded-2xl border px-5 py-4 text-sm ${
               isError
-                ? "border-red-500/30 bg-red-500/10 text-red-300"
-                : "border-green-500/30 bg-green-500/10 text-green-300"
+                ? "border-red-200 bg-red-50 text-red-800"
+                : "border-green-200 bg-green-50 text-green-800"
             }`}
           >
             {message}
@@ -132,7 +161,7 @@ export default function NewProjectPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:p-8"
+          className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm max-w-4xl"
         >
           <div className="space-y-5">
             <Field
@@ -144,7 +173,7 @@ export default function NewProjectPage() {
             />
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Project Description
               </label>
 
@@ -154,10 +183,10 @@ export default function NewProjectPage() {
                 rows={6}
                 maxLength={1000}
                 placeholder="Explain the project problem, your solution and key results..."
-                className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none placeholder:text-slate-600 focus:border-blue-500"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white text-sm"
               />
 
-              <p className="mt-1 text-right text-xs text-slate-500">
+              <p className="mt-1 text-right text-xs text-slate-400">
                 {description.length}/1000
               </p>
             </div>
@@ -174,7 +203,7 @@ export default function NewProjectPage() {
               value={githubUrl}
               type="url"
               placeholder="https://github.com/username/project"
-              onChange={setGithubUrl}
+              onChange={githubUrl => setGithubUrl(githubUrl)}
             />
 
             <Field
@@ -182,14 +211,14 @@ export default function NewProjectPage() {
               value={liveUrl}
               type="url"
               placeholder="https://project-demo.vercel.app"
-              onChange={setLiveUrl}
+              onChange={liveUrl => setLiveUrl(liveUrl)}
             />
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-white/10 pt-6 sm:flex-row sm:justify-end">
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
             <Link
               href="/dashboard"
-              className="rounded-xl border border-white/10 px-6 py-3 text-center font-semibold transition hover:bg-white/5"
+              className="rounded-xl border border-slate-200 px-6 py-3 text-center font-semibold text-slate-700 hover:bg-slate-50 transition"
             >
               Cancel
             </Link>
@@ -197,14 +226,14 @@ export default function NewProjectPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-7 py-3 font-semibold transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/10"
             >
               {saving ? "Saving Project..." : "Add Project"}
             </button>
           </div>
         </form>
-      </div>
-    </main>
+      </section>
+    </AppShell>
   );
 }
 
@@ -225,7 +254,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-slate-300">
+      <label className="mb-2 block text-sm font-medium text-slate-700">
         {label}
       </label>
 
@@ -235,7 +264,7 @@ function Field({
         placeholder={placeholder}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 outline-none placeholder:text-slate-600 focus:border-blue-500"
+        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white text-sm"
       />
     </div>
   );
