@@ -11,11 +11,33 @@ const MODES = [
   { id: "Next Step", icon: "🎯", label: "Next Step" },
 ];
 
-type AIGuideProps = {
-  userFullName: string;
+type ProfileData = {
+  college: string | null;
+  course: string | null;
+  branch: string | null;
+  year: string | null;
+  skills: string[] | null;
+  bio: string | null;
+  resume_url: string | null;
+} | null;
+
+type ProjectData = {
+  title: string;
+  description: string | null;
+  tech_stack: string[] | null;
 };
 
-export default function AIGuide({ userFullName }: AIGuideProps) {
+type AIGuideProps = {
+  userFullName: string;
+  profile: ProfileData;
+  projects: ProjectData[];
+};
+
+export default function AIGuide({
+  userFullName,
+  profile,
+  projects,
+}: AIGuideProps) {
   const firstName = userFullName.trim().split(/\s+/)[0] || "Student";
   const [activeMode, setActiveMode] = useState("Study");
   const [input, setInput] = useState("");
@@ -87,6 +109,8 @@ How can I help you today?`,
             ],
             mode: activeMode,
             userFullName,
+            profile,
+            projects,
           }),
         });
 

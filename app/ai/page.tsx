@@ -8,33 +8,80 @@ import AIGuide from "../components/AIGuide";
 
 type User = { id: string; fullName: string; email: string };
 
+type ProfileData = {
+  college: string | null;
+  course: string | null;
+  branch: string | null;
+  year: string | null;
+  skills: string[] | null;
+  bio: string | null;
+  resume_url: string | null;
+};
+
+type ProjectData = {
+  title: string;
+  description: string | null;
+  tech_stack: string[] | null;
+};
+
 export default function AIPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
-    async function loadUser() {
+    let active = true;
+
+    async function loadData() {
       const {
         data: { user: authUser },
         error,
       } = await supabase.auth.getUser();
 
       if (error || !authUser) {
-        router.replace("/login");
+        if (active) router.replace("/login");
         return;
       }
 
+      if (!active) return;
       setUser({
         id: authUser.id,
         fullName: authUser.user_metadata?.full_name ?? "Student",
         email: authUser.email ?? "",
       });
-      setLoading(false);
+
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("college, course, branch, year, skills, bio, resume_url")
+        .eq("id", authUser.id)
+        .single();
+
+      if (active && profileData) {
+        setProfile(profileData as ProfileData);
+      }
+
+      // Fetch projects
+      const { data: projectsData } = await supabase
+        .from("projects")
+        .select("title, description, tech_stack")
+        .eq("user_id", authUser.id);
+
+      if (active && projectsData) {
+        setProjects(projectsData as ProjectData[]);
+      }
+
+      if (active) setLoading(false);
     }
 
-    loadUser();
+    loadData();
+
+    return () => {
+      active = false;
+    };
   }, [router]);
 
   const initials = useMemo(
@@ -94,7 +141,11 @@ export default function AIPage() {
         </div>
 
         <div className="w-full relative">
-          <AIGuide userFullName={user.fullName} />
+          <AIGuide
+            userFullName={user.fullName}
+            profile={profile}
+            projects={projects}
+          />
         </div>
       </section>
     </AppShell>

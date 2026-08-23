@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { messages, mode, userFullName } = await req.json();
+    const { messages, mode, userFullName, profile, projects } = await req.json();
 
     const firstName = userFullName
       ? userFullName.trim().split(/\s+/)[0]
@@ -33,10 +33,50 @@ export async function POST(req: Request) {
         modeGuide = "Give general academic and project guidance.";
     }
 
+    // Build the dynamic, context-aware student overview
+    let studentContext = "";
+    if (profile) {
+      studentContext += `
+Student Details:
+- College: ${profile.college || "Not specified"}
+- Course: ${profile.course || "Not specified"}
+- Branch: ${profile.branch || "Not specified"}
+- Current Year: ${profile.year || "Not specified"}
+- Skills listed: ${
+        Array.isArray(profile.skills) && profile.skills.length > 0
+          ? profile.skills.join(", ")
+          : "No skills listed yet"
+      }
+- Bio/About: ${profile.bio || "No biography filled yet"}
+- Resume Status: ${profile.resume_url ? "Uploaded" : "NOT uploaded yet"}
+`;
+    }
+
+    if (projects && Array.isArray(projects)) {
+      if (projects.length > 0) {
+        studentContext += `\nStudent Projects:\n`;
+        projects.forEach((proj: any, idx: number) => {
+          studentContext += `${idx + 1}. ${proj.title}: ${
+            proj.description || "No description"
+          } (Tech stack: ${
+            Array.isArray(proj.tech_stack)
+              ? proj.tech_stack.join(", ")
+              : "Not listed"
+          })\n`;
+        });
+      } else {
+        studentContext += `\nStudent Projects: None listed yet.\n`;
+      }
+    }
+
     const systemPrompt = `You are CampusLoop AI, an intelligent student campus assistant.
 Your goal is to provide practical, motivating, and actionable student guidance.
 You are talking to ${firstName}. Make your responses personalized to them.
 Focus your response on the current active mode: ${mode}. Specifically: ${modeGuide}
+
+Here is the student's real profile/project context. Use it to tailor your response. If they ask about projects or studies, consult this context first. DO NOT invent details that are not provided. If a detail is missing (e.g. no resume uploaded), you can point that out as a logical next step to do:
+${studentContext}
+
 Format your answers with bullet points and bold text where appropriate for readability.
 Respond in a friendly, concise, and professional Hinglish style (mostly English mixed with common, clean Hindi written in the English script).
 Do not generate generic chatbot chatter. Give real, practical value.`;
