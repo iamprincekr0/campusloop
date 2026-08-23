@@ -111,9 +111,9 @@ export default function NewProjectPage() {
 
   if (loading || !user) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f7f8fc]">
+      <main className="grid min-h-screen place-items-center bg-[#050816]">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
           <p className="mt-4 text-sm font-medium text-slate-500">
             Loading project form...
           </p>
@@ -133,15 +133,15 @@ export default function NewProjectPage() {
       <section className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-600">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-400">
               Project Portfolio
             </p>
 
-            <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-slate-950 sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-white sm:text-4xl">
               Add New Project
             </h1>
 
-            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
               Showcase your technical work to students and recruiters.
             </p>
           </div>
@@ -151,8 +151,8 @@ export default function NewProjectPage() {
           <div
             className={`mb-6 rounded-2xl border px-5 py-4 text-sm ${
               isError
-                ? "border-red-200 bg-red-50 text-red-800"
-                : "border-green-200 bg-green-50 text-green-800"
+                ? "border-red-900/50 bg-red-950/20 text-red-400"
+                : "border-green-900/50 bg-green-950/20 text-green-400"
             }`}
           >
             {message}
@@ -161,7 +161,7 @@ export default function NewProjectPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm max-w-4xl"
+          className="rounded-3xl border border-slate-900/60 bg-slate-950/40 p-6 md:p-8 shadow-2xl backdrop-blur-xl max-w-4xl"
         >
           <div className="space-y-5">
             <Field
@@ -173,7 +173,7 @@ export default function NewProjectPage() {
             />
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
+              <label className="mb-2 block text-sm font-medium text-slate-300">
                 Project Description
               </label>
 
@@ -183,10 +183,10 @@ export default function NewProjectPage() {
                 rows={6}
                 maxLength={1000}
                 placeholder="Explain the project problem, your solution and key results..."
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white text-sm"
+                className="w-full resize-none rounded-xl border border-slate-900/60 bg-slate-900/20 px-4 py-3 text-slate-200 outline-none placeholder:text-slate-500 focus:border-blue-500/50 focus:bg-slate-950/20 text-sm transition"
               />
 
-              <p className="mt-1 text-right text-xs text-slate-400">
+              <p className="mt-1 text-right text-xs text-slate-500">
                 {description.length}/1000
               </p>
             </div>
@@ -215,10 +215,10 @@ export default function NewProjectPage() {
             />
           </div>
 
-          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-900/60 pt-6 sm:flex-row sm:justify-end">
             <Link
               href="/dashboard"
-              className="rounded-xl border border-slate-200 px-6 py-3 text-center font-semibold text-slate-700 hover:bg-slate-50 transition"
+              className="rounded-xl border border-slate-800/40 px-6 py-3 text-center font-semibold text-slate-300 hover:bg-white/5 transition"
             >
               Cancel
             </Link>
@@ -226,7 +226,7 @@ export default function NewProjectPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/10"
+              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-650 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/15"
             >
               {saving ? "Saving Project..." : "Add Project"}
             </button>
@@ -254,7 +254,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-slate-700">
+      <label className="mb-2 block text-sm font-medium text-slate-300">
         {label}
       </label>
 
@@ -264,7 +264,7 @@ function Field({
         placeholder={placeholder}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white text-sm"
+        className="w-full rounded-xl border border-slate-900/60 bg-slate-900/20 px-4 py-3 text-slate-200 outline-none placeholder:text-slate-500 focus:border-blue-500/50 focus:bg-slate-950/20 text-sm transition"
       />
     </div>
   );

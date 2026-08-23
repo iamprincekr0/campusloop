@@ -15,6 +15,7 @@ type FestivalConfig = {
   end: string;
   emoji: string;
   gradient: string;
+  accentBar: string;
 };
 
 const FESTIVALS: FestivalConfig[] = [
@@ -24,7 +25,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-01-25",
     end: "2026-01-27",
     emoji: "🇮🇳",
-    gradient: "from-orange-500 via-white to-green-500",
+    gradient: "from-orange-500/15 via-white/5 to-green-500/15",
+    accentBar: "from-orange-500 via-white to-green-500",
   },
   {
     title: "Happy Holi",
@@ -32,7 +34,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-03-02",
     end: "2026-03-04",
     emoji: "🎨",
-    gradient: "from-pink-400 via-yellow-300 to-cyan-400",
+    gradient: "from-pink-500/15 via-yellow-500/10 to-cyan-500/15",
+    accentBar: "from-pink-500 via-yellow-400 to-cyan-500",
   },
   {
     title: "Happy Independence Day",
@@ -40,7 +43,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-08-14",
     end: "2026-08-16",
     emoji: "🇮🇳",
-    gradient: "from-orange-500 via-white to-green-500",
+    gradient: "from-orange-500/15 via-white/5 to-green-500/15",
+    accentBar: "from-orange-500 via-white to-green-500",
   },
   {
     title: "Happy Teacher's Day",
@@ -48,7 +52,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-09-04",
     end: "2026-09-06",
     emoji: "🍎",
-    gradient: "from-blue-400 via-indigo-500 to-purple-600",
+    gradient: "from-blue-500/15 via-indigo-500/10 to-purple-600/15",
+    accentBar: "from-blue-500 via-indigo-500 to-purple-600",
   },
   {
     title: "Happy Ganesh Chaturthi",
@@ -56,7 +61,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-09-14",
     end: "2026-09-25",
     emoji: "🙏",
-    gradient: "from-orange-400 via-pink-500 to-violet-600",
+    gradient: "from-orange-500/20 via-red-500/15 to-yellow-600/20",
+    accentBar: "from-orange-500 via-red-500 to-yellow-600",
   },
   {
     title: "Happy Engineer's Day",
@@ -64,7 +70,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-09-14",
     end: "2026-09-16",
     emoji: "⚙️",
-    gradient: "from-slate-700 via-slate-800 to-slate-950",
+    gradient: "from-slate-700/20 via-slate-800/20 to-slate-950/30",
+    accentBar: "from-slate-650 via-slate-750 to-slate-900",
   },
   {
     title: "Happy Diwali",
@@ -72,7 +79,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-11-07",
     end: "2026-11-10",
     emoji: "🪔",
-    gradient: "from-yellow-500 via-orange-500 to-red-600",
+    gradient: "from-yellow-500/20 via-orange-500/15 to-red-600/20",
+    accentBar: "from-yellow-500 via-orange-500 to-red-600",
   },
   {
     title: "Mid-Semester Exams",
@@ -80,7 +88,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-10-12",
     end: "2026-10-17",
     emoji: "📝",
-    gradient: "from-blue-600 via-violet-600 to-indigo-700",
+    gradient: "from-blue-600/20 via-violet-600/15 to-indigo-700/20",
+    accentBar: "from-blue-500 via-violet-500 to-indigo-650",
   },
   {
     title: "End-Semester Exams",
@@ -88,7 +97,8 @@ const FESTIVALS: FestivalConfig[] = [
     start: "2026-12-07",
     end: "2026-12-19",
     emoji: "🎓",
-    gradient: "from-indigo-600 via-blue-600 to-slate-900",
+    gradient: "from-indigo-600/20 via-blue-600/15 to-slate-900/20",
+    accentBar: "from-indigo-500 via-blue-500 to-slate-800",
   },
 ];
 
@@ -105,8 +115,7 @@ const DAILY_MESSAGES = [
 function getGreeting(hour: number) {
   if (hour >= 5 && hour < 12) return "Good morning";
   if (hour >= 12 && hour < 17) return "Good afternoon";
-  if (hour >= 17 && hour < 21) return "Good evening";
-  return "Welcome back";
+  return "Good evening";
 }
 
 function getLocalDateKey(date: Date) {
@@ -174,7 +183,7 @@ export default function CampusPulse({
 
   if (!pulse) {
     return (
-      <div className="mb-6 h-[150px] animate-pulse rounded-[28px] bg-slate-100" />
+      <div className="mb-6 h-[150px] animate-pulse rounded-[28px] bg-slate-900/40 border border-slate-900/60" />
     );
   }
 
@@ -183,29 +192,36 @@ export default function CampusPulse({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="relative mb-6 overflow-hidden rounded-[30px] border border-slate-200/70 bg-white shadow-[0_14px_45px_rgba(15,23,42,0.06)]"
+      className="relative mb-6 overflow-hidden rounded-[30px] border border-slate-800/40 bg-slate-950/40 backdrop-blur-xl shadow-2xl"
     >
-      {/* ambient glow */}
+      {/* Dynamic ambient glow based on festival or normal state */}
       <div
-        className={`pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl ${
+        className={`pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full blur-[100px] transition-all duration-700 ${
           pulse.festival
-            ? "bg-orange-300/20"
-            : "bg-blue-300/15"
+            ? "bg-orange-500/10"
+            : "bg-blue-500/10"
         }`}
       />
 
       <div
-        className={`pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full blur-3xl ${
+        className={`pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full blur-[100px] transition-all duration-700 ${
           pulse.festival
-            ? "bg-violet-300/15"
-            : "bg-cyan-300/10"
+            ? "bg-violet-500/8"
+            : "bg-indigo-500/5"
         }`}
       />
+
+      {/* Reusable ambient color panel for active festival */}
+      {pulse.festival && (
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${pulse.festival.gradient} opacity-20`}
+        />
+      )}
 
       {/* festival top accent */}
       {pulse.festival && (
         <div
-          className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${pulse.festival.gradient}`}
+          className={`absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r ${pulse.festival.accentBar} shadow-[0_0_12px_#ffedd5]`}
         />
       )}
 
@@ -214,8 +230,8 @@ export default function CampusPulse({
           <div
             className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${
               pulse.festival
-                ? "bg-gradient-to-br from-orange-100 to-pink-100 text-2xl"
-                : "bg-blue-50 text-blue-600"
+                ? "bg-gradient-to-br from-orange-500/20 to-pink-500/20 border border-orange-500/30 text-2xl"
+                : "bg-blue-500/10 border border-blue-500/20 text-blue-400"
             }`}
           >
             {pulse.festival ? (
@@ -229,38 +245,38 @@ export default function CampusPulse({
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-3.5 w-3.5 text-blue-500" />
+              <Sparkles className="h-3.5 w-3.5 text-blue-450" />
 
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-400">
                 CampusPulse
               </span>
 
               {pulse.festival && (
                 <>
-                  <span className="h-1 w-1 rounded-full bg-slate-300" />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-600">
+                  <span className="h-1 w-1 rounded-full bg-slate-800" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-orange-400">
                     Special day
                   </span>
                 </>
               )}
             </div>
 
-            <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em] text-slate-950 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em] text-white sm:text-3xl">
               {pulse.greeting}, {pulse.firstName}.
             </h2>
 
             {pulse.festival ? (
               <>
-                <p className="mt-2 text-sm font-bold text-slate-800 sm:text-base">
+                <p className="mt-2 text-sm font-bold text-slate-200 sm:text-base">
                   {pulse.festival.title} {pulse.festival.emoji}
                 </p>
 
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
                   {pulse.festival.message}
                 </p>
               </>
             ) : (
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
                 {pulse.motivation}
               </p>
             )}
@@ -269,8 +285,8 @@ export default function CampusPulse({
           <Star
             className={`hidden h-4 w-4 shrink-0 sm:block ${
               pulse.festival
-                ? "text-orange-400"
-                : "text-slate-200"
+                ? "text-orange-450 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+                : "text-slate-800"
             }`}
           />
         </div>

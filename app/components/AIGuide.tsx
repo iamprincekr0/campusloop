@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Send, Download } from "lucide-react";
 
 const MODES = [
   { id: "Study", icon: "📚", label: "Study Guide" },
@@ -147,18 +149,21 @@ How can I help you today?`,
   };
 
   return (
-    <div className="flex flex-col h-[70vh] bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+    <div className="flex flex-col h-[70vh] bg-slate-950/40 rounded-3xl border border-slate-900/60 shadow-2xl backdrop-blur-xl overflow-hidden relative">
+      {/* Glowing Orb ambient indicator */}
+      <div className="absolute top-[-50px] left-[50%] -translate-x-[50%] h-[120px] w-[220px] rounded-full bg-blue-500/5 blur-[50px] pointer-events-none" />
+
       {/* Mode Selector */}
-      <div className="bg-slate-50 border-b border-slate-200/80 p-4">
+      <div className="bg-slate-900/20 border-b border-slate-900/60 p-4 relative z-10">
         <div className="flex flex-wrap gap-2">
           {MODES.map((mode) => (
             <button
               key={mode.id}
               onClick={() => setActiveMode(mode.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                 activeMode === mode.id
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/10"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                  ? "bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                  : "bg-slate-950/60 text-slate-400 border border-slate-900/60 hover:bg-white/5"
               }`}
             >
               <span>{mode.icon}</span> {mode.label}
@@ -168,51 +173,62 @@ How can I help you today?`,
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/30">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                msg.role === "user"
-                  ? "bg-blue-600 text-white rounded-br-none shadow-sm shadow-blue-600/10"
-                  : "bg-white text-slate-800 border border-slate-200/60 rounded-bl-none shadow-sm"
+      <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-950/10 scrollbar-thin relative z-10">
+        <AnimatePresence initial={false}>
+          {messages.map((msg, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {msg.type === "image" ? (
-                <div className="relative w-full overflow-hidden rounded-xl mt-1">
-                  <img
-                    src={msg.content}
-                    alt="Generated Visual"
-                    className="w-full h-auto object-cover rounded-xl shadow-sm border border-slate-100"
-                  />
-                  <a
-                    href={msg.content}
-                    download="campusloop-ai-diagram.jpg"
-                    className="absolute bottom-2.5 right-2.5 bg-slate-950/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-slate-950 transition backdrop-blur-sm shadow-sm"
-                  >
-                    Download
-                  </a>
-                </div>
-              ) : (
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-              )}
-            </div>
-          </div>
-        ))}
+              <div
+                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-blue-600/90 text-white rounded-br-none shadow-[0_4px_15px_rgba(59,130,246,0.25)]"
+                    : "bg-slate-900/50 text-slate-200 border border-slate-800/40 rounded-bl-none shadow-inner"
+                }`}
+              >
+                {msg.type === "image" ? (
+                  <div className="relative w-full overflow-hidden rounded-xl mt-1 group">
+                    <img
+                      src={msg.content}
+                      alt="Generated Visual"
+                      className="w-full h-auto object-cover rounded-xl shadow-md border border-slate-800/50 transition duration-500 group-hover:scale-[1.01]"
+                    />
+                    <a
+                      href={msg.content}
+                      download="campusloop-ai-diagram.jpg"
+                      className="absolute bottom-2.5 right-2.5 bg-slate-950/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-slate-950 transition backdrop-blur-sm shadow-md border border-slate-800/30 flex items-center gap-1.5"
+                    >
+                      <Download className="h-3 w-3" /> Download
+                    </a>
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-5 py-4 shadow-sm">
-              <div className="flex gap-1.5">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.15s" }}></div>
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.3s" }}></div>
+            <div className="bg-slate-900/50 border border-slate-800/40 rounded-2xl rounded-bl-none px-5 py-4 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-blue-450 animate-pulse" />
+                <span className="text-xs font-semibold text-slate-400 tracking-wide">
+                  Generating...
+                </span>
+                <div className="flex gap-1 ml-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.15s" }}></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.3s" }}></div>
+                </div>
               </div>
             </div>
           </div>
@@ -220,21 +236,21 @@ How can I help you today?`,
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-white border-t border-slate-200/80">
+      <div className="p-4 bg-slate-950/60 border-t border-slate-900/60 relative z-10">
         <form onSubmit={handleSend} className="flex gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask in ${activeMode} mode or type /draw for diagrams & visuals...`}
-            className="flex-1 bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+            className="flex-1 bg-slate-900/40 border border-slate-900/80 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-slate-950/30 transition duration-300"
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-bold text-sm transition shadow-md shadow-blue-600/10 shrink-0"
+            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-blue-600/15 shrink-0 flex items-center gap-1.5"
           >
-            Send
+            <Send className="h-3.5 w-3.5" /> Send
           </button>
         </form>
       </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarDays,
@@ -171,7 +172,6 @@ export default function DashboardPage() {
   const checklist = useMemo<ChecklistItem[]>(() => {
     const list: ChecklistItem[] = [];
 
-    // 1. Projects check
     list.push({
       id: "projects",
       label: "Showcase a project to highlight your skills",
@@ -180,7 +180,6 @@ export default function DashboardPage() {
       cta: "Add project",
     });
 
-    // 2. Profile Photo
     list.push({
       id: "avatar",
       label: "Upload a profile photo for peers and recruiters",
@@ -189,7 +188,6 @@ export default function DashboardPage() {
       cta: "Upload photo",
     });
 
-    // 3. Resume
     list.push({
       id: "resume",
       label: "Upload a resume PDF to prepare for matching",
@@ -198,7 +196,6 @@ export default function DashboardPage() {
       cta: "Upload resume",
     });
 
-    // 4. Skills & Bio
     list.push({
       id: "skills_bio",
       label: "Add technical skills and a brief bio",
@@ -210,12 +207,27 @@ export default function DashboardPage() {
     return list;
   }, [projects, profile]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
   /* loading state */
   if (loading || !user) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f7f8fc]">
+      <main className="grid min-h-screen place-items-center bg-[#050816]">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
           <p className="mt-4 text-sm font-medium text-slate-500">
             Loading your workspace…
           </p>
@@ -232,241 +244,262 @@ export default function DashboardPage() {
       onLogout={handleLogout}
       loggingOut={loggingOut}
     >
-      <section className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10">
+      <motion.section 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10"
+      >
         {/* ── personalized greeting ── */}
-        <CampusPulse fullName={user.fullName} />
+        <motion.div variants={itemVariants}>
+          <CampusPulse fullName={user.fullName} />
+        </motion.div>
 
         {/* ── quick actions ── */}
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <motion.div 
+          variants={itemVariants} 
+          className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4"
+        >
           <QuickAction
             href="/projects/new"
             icon={Plus}
             label="New Project"
-            tone="bg-blue-50 text-blue-600"
+            tone="bg-blue-500/10 text-blue-400 border border-blue-500/20"
           />
           <QuickAction
             href="/events/extension-board-2026"
             icon={Compass}
             label="Browse Events"
-            tone="bg-violet-50 text-violet-600"
+            tone="bg-violet-500/10 text-violet-400 border border-violet-500/20"
           />
           <QuickAction
             href="/profile"
             icon={UserRound}
             label="Edit Profile"
-            tone="bg-emerald-50 text-emerald-600"
+            tone="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
           />
           <QuickAction
             href="/ai"
             icon={Sparkles}
             label="AI Guide"
-            tone="bg-amber-50 text-amber-600"
+            tone="bg-amber-500/10 text-amber-400 border border-amber-500/20"
           />
-        </div>
+        </motion.div>
 
         {/* ── main grid ── */}
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           {/* ─ left column ─ */}
           <div className="space-y-6">
             {/* upcoming events */}
-            <DashboardSection
-              title="Upcoming Events"
-              icon={CalendarDays}
-              actionHref="/events/extension-board-2026"
-              actionLabel="All events"
-            >
-              {events.length === 0 ? (
-                <EmptyState
-                  icon={CalendarDays}
-                  message="No upcoming events right now."
-                  cta="Browse events"
-                  href="/events/extension-board-2026"
-                />
-              ) : (
-                <div className="space-y-3">
-                  {events.map((event) => (
-                    <Link
-                      key={event.id}
-                      href={`/events/${event.slug}`}
-                      className="group flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-                    >
-                      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-600">
-                        <CalendarDays className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-slate-900">
-                          {event.title}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {event.event_date
-                            ? formatEventDate(event.event_date)
-                            : "Date TBA"}
-                          {event.venue ? ` · ${event.venue}` : ""}
-                        </p>
-                      </div>
-                      {event.registration_open && (
-                        <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
-                          Open
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </DashboardSection>
+            <motion.div variants={itemVariants}>
+              <DashboardSection
+                title="Upcoming Events"
+                icon={CalendarDays}
+                actionHref="/events/extension-board-2026"
+                actionLabel="All events"
+              >
+                {events.length === 0 ? (
+                  <EmptyState
+                    icon={CalendarDays}
+                    message="No upcoming events right now."
+                    cta="Browse events"
+                    href="/events/extension-board-2026"
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {events.map((event) => (
+                      <Link
+                        key={event.id}
+                        href={`/events/${event.slug}`}
+                        className="group flex items-center gap-4 rounded-2xl border border-slate-900 bg-slate-950/20 p-4 transition-all duration-300 hover:scale-[1.01] hover:border-slate-800 hover:bg-slate-900/10"
+                      >
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                          <CalendarDays className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors">
+                            {event.title}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {event.event_date
+                              ? formatEventDate(event.event_date)
+                              : "Date TBA"}
+                            {event.venue ? ` · ${event.venue}` : ""}
+                          </p>
+                        </div>
+                        {event.registration_open && (
+                          <span className="shrink-0 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 text-[10px] font-bold text-emerald-400">
+                            Open
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </DashboardSection>
+            </motion.div>
 
             {/* my projects */}
-            <DashboardSection
-              title="My Projects"
-              icon={FolderKanban}
-              actionHref="/projects"
-              actionLabel="All projects"
-            >
-              {projects.length === 0 ? (
-                <EmptyState
-                  icon={FolderKanban}
-                  message="You haven't added any projects yet."
-                  cta="Create your first project"
-                  href="/projects/new"
-                />
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {projects.map((project) => (
-                    <article
-                      key={project.id}
-                      className="rounded-2xl border border-slate-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-                    >
-                      <p className="truncate text-sm font-bold text-slate-900">
-                        {project.title}
-                      </p>
-                      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-500">
-                        {project.description ||
-                          "No description yet."}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {(project.tech_stack ?? [])
-                          .slice(0, 3)
-                          .map((tech) => (
-                            <span
-                              key={tech}
-                              className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                      </div>
-                      {(project.github_url ||
-                        project.live_url) && (
-                        <div className="mt-3 flex gap-3 border-t border-slate-50 pt-2.5">
-                          {project.github_url && (
-                            <a
-                              href={project.github_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-600"
-                            >
-                              <GitBranch className="h-3 w-3" />{" "}
-                              Code
-                            </a>
-                          )}
-                          {project.live_url && (
-                            <a
-                              href={project.live_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-600"
-                            >
-                              <ExternalLink className="h-3 w-3" />{" "}
-                              Demo
-                            </a>
-                          )}
+            <motion.div variants={itemVariants}>
+              <DashboardSection
+                title="My Projects"
+                icon={FolderKanban}
+                actionHref="/projects"
+                actionLabel="All projects"
+              >
+                {projects.length === 0 ? (
+                  <EmptyState
+                    icon={FolderKanban}
+                    message="You haven't added any projects yet."
+                    cta="Create your first project"
+                    href="/projects/new"
+                  />
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {projects.map((project) => (
+                      <article
+                        key={project.id}
+                        className="rounded-2xl border border-slate-900 bg-slate-950/20 p-4 hover:border-slate-800 transition duration-300 hover:scale-[1.01]"
+                      >
+                        <p className="truncate text-sm font-bold text-slate-100">
+                          {project.title}
+                        </p>
+                        <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-400">
+                          {project.description ||
+                            "No description yet."}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {(project.tech_stack ?? [])
+                            .slice(0, 3)
+                            .map((tech) => (
+                              <span
+                                key={tech}
+                                className="rounded-full bg-slate-900 border border-slate-800/80 px-2.5 py-0.5 text-[10px] font-bold text-slate-400"
+                              >
+                                {tech}
+                              </span>
+                            ))}
                         </div>
-                      )}
-                    </article>
-                  ))}
-                </div>
-              )}
-            </DashboardSection>
+                        {(project.github_url ||
+                          project.live_url) && (
+                          <div className="mt-3 flex gap-3 border-t border-slate-900/60 pt-2.5">
+                            {project.github_url && (
+                              <a
+                                href={project.github_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-400 transition"
+                              >
+                                <GitBranch className="h-3 w-3" />{" "}
+                                Code
+                              </a>
+                            )}
+                            {project.live_url && (
+                              <a
+                                href={project.live_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-400 transition"
+                              >
+                                <ExternalLink className="h-3 w-3" />{" "}
+                                Demo
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </DashboardSection>
+            </motion.div>
           </div>
 
           {/* ─ right column ─ */}
           <div className="space-y-6">
             {/* what should i do next? Checklist */}
-            <DashboardSection title="What should I do next?" icon={CheckCircle2}>
-              <div className="space-y-4">
-                {checklist.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50"
-                  >
-                    {item.completed ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <Circle className="h-5 w-5 text-slate-300 shrink-0 mt-0.5" />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className={`text-sm font-medium leading-relaxed ${
-                          item.completed
-                            ? "text-slate-400 line-through"
-                            : "text-slate-700"
-                        }`}
-                      >
-                        {item.label}
-                      </p>
-                      {!item.completed && (
-                        <Link
-                          href={item.href}
-                          className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800"
-                        >
-                          {item.cta} <ArrowRight className="h-3 w-3" />
-                        </Link>
+            <motion.div variants={itemVariants}>
+              <DashboardSection title="What should I do next?" icon={CheckCircle2}>
+                <div className="space-y-4">
+                  {checklist.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-start gap-3 rounded-xl p-2 transition duration-255 hover:bg-white/5"
+                    >
+                      {item.completed ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-450 shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-slate-700 shrink-0 mt-0.5" />
                       )}
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className={`text-sm font-medium leading-relaxed ${
+                            item.completed
+                              ? "text-slate-500 line-through"
+                              : "text-slate-300"
+                          }`}
+                        >
+                          {item.label}
+                        </p>
+                        {!item.completed && (
+                          <Link
+                            href={item.href}
+                            className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 transition"
+                          >
+                            {item.cta} <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </DashboardSection>
+                  ))}
+                </div>
+              </DashboardSection>
+            </motion.div>
 
             {/* campus intelligence promo */}
-            <div className="rounded-[28px] bg-gradient-to-br from-slate-950 to-slate-800 p-6 text-white shadow-xl shadow-slate-900/10">
-              <span className="inline-flex rounded-xl bg-white/10 p-2.5 text-blue-200">
+            <motion.div 
+              variants={itemVariants}
+              className="rounded-[28px] bg-gradient-to-br from-slate-900/60 to-slate-950/80 border border-slate-800/40 p-6 text-white shadow-xl"
+            >
+              <span className="inline-flex rounded-xl bg-white/5 border border-white/5 p-2.5 text-blue-300">
                 <Sparkles className="h-5 w-5" />
               </span>
-              <h3 className="mt-5 text-lg font-bold">
+              <h3 className="mt-5 text-lg font-bold text-white">
                 Need guidance?
               </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
+              <p className="mt-2 text-sm leading-6 text-slate-400">
                 Ask CampusLoop AI about study plans, project ideas,
                 career advice, or campus opportunities.
               </p>
               <Link
                 href="/ai"
-                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-200 transition hover:text-white"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-300 transition hover:text-white"
               >
                 Open AI Guide{" "}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-            </div>
+            </motion.div>
 
             {/* your progress card */}
-            <DashboardSection title="Your Campus" icon={MapPin}>
-              <div className="space-y-4">
-                <ProgressRow
-                  label="Projects"
-                  value={projects.length}
-                  href="/projects"
-                />
-                <ProgressRow
-                  label="Events available"
-                  value={events.length}
-                  href="/events/extension-board-2026"
-                />
-              </div>
-            </DashboardSection>
+            <motion.div variants={itemVariants}>
+              <DashboardSection title="Your Campus" icon={MapPin}>
+                <div className="space-y-4">
+                  <ProgressRow
+                    label="Projects"
+                    value={projects.length}
+                    href="/projects"
+                  />
+                  <ProgressRow
+                    label="Events available"
+                    value={events.length}
+                    href="/events/extension-board-2026"
+                  />
+                </div>
+              </DashboardSection>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
     </AppShell>
   );
 }
@@ -487,14 +520,14 @@ function QuickAction({
   return (
     <Link
       href={href}
-      className="group flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 py-3.5 transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex items-center gap-3 rounded-2xl border border-slate-800/40 bg-slate-950/30 px-4 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-900/40 hover:shadow-lg hover:border-slate-800/80"
     >
       <span
         className={`grid h-9 w-9 place-items-center rounded-xl ${tone}`}
       >
         <Icon className="h-4 w-4" />
       </span>
-      <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900">
+      <span className="text-sm font-semibold text-slate-300 group-hover:text-white transition-colors">
         {label}
       </span>
     </Link>
@@ -515,18 +548,18 @@ function DashboardSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[28px] border border-slate-200/70 bg-white/60 p-5 shadow-sm backdrop-blur-sm sm:p-6">
+    <section className="rounded-[28px] border border-slate-800/40 bg-slate-950/40 p-5 shadow-xl backdrop-blur-xl sm:p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <Icon className="h-4 w-4 text-slate-400" />
-          <h2 className="text-sm font-bold text-slate-800">
+          <Icon className="h-4 w-4 text-slate-500" />
+          <h2 className="text-sm font-bold text-slate-200">
             {title}
           </h2>
         </div>
         {actionHref && actionLabel && (
           <Link
             href={actionHref}
-            className="text-xs font-bold text-blue-600 transition hover:text-blue-800"
+            className="text-xs font-bold text-blue-400 transition hover:text-blue-300"
           >
             {actionLabel}
           </Link>
@@ -549,14 +582,14 @@ function EmptyState({
   href: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-200 px-5 py-8 text-center">
-      <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-slate-50 text-slate-400">
+    <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-950/20 px-5 py-8 text-center">
+      <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-slate-900/50 text-slate-500 border border-slate-800/30">
         <Icon className="h-5 w-5" />
       </span>
-      <p className="mt-3 text-sm text-slate-500">{message}</p>
+      <p className="mt-3 text-sm text-slate-400">{message}</p>
       <Link
         href={href}
-        className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300 transition"
       >
         {cta} <ArrowRight className="h-3 w-3" />
       </Link>
@@ -576,10 +609,10 @@ function ProgressRow({
   return (
     <Link
       href={href}
-      className="flex items-center justify-between rounded-xl px-1 py-1 transition hover:bg-slate-50"
+      className="flex items-center justify-between rounded-xl px-2 py-1.5 transition duration-150 hover:bg-white/5"
     >
-      <span className="text-sm text-slate-600">{label}</span>
-      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+      <span className="text-sm text-slate-400">{label}</span>
+      <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-0.5 text-xs font-bold text-blue-400">
         {value}
       </span>
     </Link>
