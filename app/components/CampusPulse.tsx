@@ -155,7 +155,12 @@ export default function CampusPulse({
 
   useEffect(() => {
     const updateTime = () => {
-      setNow(new Date());
+      const previewDateStr = process.env.NEXT_PUBLIC_CAMPUSLOOP_PREVIEW_DATE;
+      if (previewDateStr) {
+        setNow(new Date(previewDateStr));
+      } else {
+        setNow(new Date());
+      }
     };
 
     updateTime();
