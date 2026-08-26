@@ -413,7 +413,7 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <label className="mt-6 block cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 to-indigo-650 px-4 py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.02] shadow-md shadow-blue-600/10">
+            <label className="mt-6 block cursor-pointer rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.02] shadow-md shadow-blue-600/10">
               {uploadingAvatar
                 ? "Uploading Photo..."
                 : "Upload Profile Photo"}
@@ -453,7 +453,7 @@ export default function ProfilePage() {
                   href={form.resume_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 block text-center text-sm font-semibold text-blue-450 hover:text-blue-300 transition"
+                  className="mt-3 block text-center text-sm font-semibold text-blue-400 hover:text-blue-300 transition"
                 >
                   View uploaded resume
                 </a>
@@ -622,7 +622,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-650 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/15"
+                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/15"
               >
                 {saving ? "Saving Profile..." : "Save Profile"}
               </button>

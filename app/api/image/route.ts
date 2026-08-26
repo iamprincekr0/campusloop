@@ -4,6 +4,17 @@ export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
     
+    // Auth guard
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Input validation
+    if (!prompt || typeof prompt !== "string" || prompt.length > 500) {
+      return NextResponse.json({ error: "Invalid prompt" }, { status: 400 });
+    }
+
     const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
     const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 

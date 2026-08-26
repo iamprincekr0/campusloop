@@ -220,7 +220,7 @@ export default function OpportunitiesPage() {
                   </span>
                   {matched && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-400">
-                      <Sparkles className="h-3.5 w-3.5" /> Match: {score}%
+                      <Sparkles className="h-3.5 w-3.5" /> Match: {Math.min(score, 100)}%
                     </span>
                   )}
                 </div>
@@ -239,7 +239,7 @@ export default function OpportunitiesPage() {
                 <div className="space-y-2.5 border-t border-slate-900/60 pt-4 mb-4">
                   <div className="flex items-center gap-2 text-xs text-slate-400">
                     <Clock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                    <span>Apply by: <strong>{opp.deadline}</strong></span>
+                    <span>Apply by: <strong>{new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${opp.deadline}T00:00:00`))}</strong></span>
                   </div>
                   {opp.eligibility.skills && (
                     <div className="flex flex-wrap gap-1.5 pt-1">

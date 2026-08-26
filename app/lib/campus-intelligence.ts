@@ -93,6 +93,7 @@ export const OPPORTUNITIES: Opportunity[] = [
 ];
 
 export type Recommendation = {
+  id: string;
   type: "profile" | "project" | "event" | "opportunity";
   title: string;
   description: string;
@@ -101,6 +102,29 @@ export type Recommendation = {
   actionHref: string;
   matchReason?: string;
 };
+
+// Branch name normalization for fuzzy matching
+const BRANCH_ALIASES: Record<string, string> = {
+  "cse": "Computer Science",
+  "cs": "Computer Science",
+  "computer science and engineering": "Computer Science",
+  "information technology": "Computer Science",
+  "it": "Computer Science",
+  "ece": "Electronics",
+  "electronics and communication": "Electronics",
+  "electronics and telecommunication": "Electronics",
+  "entc": "Electronics",
+  "ee": "Electrical Engineering",
+  "electrical": "Electrical Engineering",
+  "me": "Mechanical Engineering",
+  "mechanical": "Mechanical Engineering",
+  "mech": "Mechanical Engineering",
+};
+
+function normalizeBranch(branch: string): string {
+  const lower = branch.toLowerCase().trim();
+  return BRANCH_ALIASES[lower] || branch;
+}
 
 // Simple rule-based opportunity matching engine
 export function matchOpportunity(
@@ -112,10 +136,11 @@ export function matchOpportunity(
 ): { matched: boolean; score: number; reasons: string[] } {
   let score = 0;
   const reasons: string[] = [];
+  const normalizedBranch = normalizeBranch(studentBranch);
 
   // 1. Branch match
   if (opp.eligibility.branches && studentBranch) {
-    if (opp.eligibility.branches.includes(studentBranch)) {
+    if (opp.eligibility.branches.includes(normalizedBranch)) {
       score += 30;
       reasons.push(`Matches your branch: ${studentBranch}`);
     } else {
@@ -191,6 +216,7 @@ export function getCampusRecommendations(
   /* ── 1. Profile Health Recommendations ── */
   if (!profile?.avatar_url) {
     recommendations.push({
+      id: "rec-profile-avatar",
       type: "profile",
       title: "Upload a profile photo",
       description: "Adding an avatar personalizes your workspace and profile page.",
@@ -202,6 +228,7 @@ export function getCampusRecommendations(
 
   if (!profile?.resume_url) {
     recommendations.push({
+      id: "rec-profile-resume",
       type: "profile",
       title: "Upload your resume PDF",
       description: "Upload a resume to enable match checking and team recruitment capabilities.",
@@ -211,12 +238,49 @@ export function getCampusRecommendations(
     });
   }
 
-  if (!profile?.bio || studentSkills.length === 0) {
+  if (!profile?.bio) {
     recommendations.push({
+      id: "rec-profile-bio",
       type: "profile",
-      title: "Update bio and skills list",
-      description: "Add a bio summary and list your skills to unlock personalized opportunities.",
+      title: "Write your bio",
+      description: "Add a short bio to help recruiters and teammates understand your background.",
+      priority: "Medium",
+      actionLabel: "Update profile",
+      actionHref: "/profile",
+    });
+  }
+
+  if (studentSkills.length === 0) {
+    recommendations.push({
+      id: "rec-profile-skills",
+      type: "profile",
+      title: "Add your skills",
+      description: "List your skills to unlock personalized opportunity matching.",
       priority: "High",
+      actionLabel: "Add skills",
+      actionHref: "/profile",
+    });
+  }
+
+  if (!studentBranch) {
+    recommendations.push({
+      id: "rec-profile-branch",
+      type: "profile",
+      title: "Set your branch",
+      description: "Specify your branch to receive opportunities matched to your field of study.",
+      priority: "High",
+      actionLabel: "Update profile",
+      actionHref: "/profile",
+    });
+  }
+
+  if (!studentYear) {
+    recommendations.push({
+      id: "rec-profile-year",
+      type: "profile",
+      title: "Set your current year",
+      description: "Specify your year to filter opportunities that match your academic stage.",
+      priority: "Medium",
       actionLabel: "Update profile",
       actionHref: "/profile",
     });
@@ -225,6 +289,7 @@ export function getCampusRecommendations(
   /* ── 2. Project Portfolio Recommendations ── */
   if (studentProjectsCount === 0) {
     recommendations.push({
+      id: "rec-project-create",
       type: "project",
       title: "Create your first project",
       description: "Create a project showcase to share your technical code and prototypes.",
@@ -237,12 +302,13 @@ export function getCampusRecommendations(
     const projectMissingRepo = projects.find((proj) => !proj.github_url);
     if (projectMissingRepo) {
       recommendations.push({
+        id: `rec-project-repo-${projectMissingRepo.id}`,
         type: "project",
         title: "Add repository link",
         description: `Add a GitHub repository link to "${projectMissingRepo.title}" so others can see your code.`,
         priority: "Medium",
         actionLabel: "Edit project",
-        actionHref: "/projects", // redirect to projects portfolio where they can see list
+        actionHref: "/projects",
       });
     }
   }
@@ -253,6 +319,7 @@ export function getCampusRecommendations(
     const nextEvent = upcomingEvents.find((e) => e.registration_open);
     if (nextEvent) {
       recommendations.push({
+        id: `rec-event-${nextEvent.id}`,
         type: "event",
         title: `Register for ${nextEvent.title}`,
         description: "Attend this upcoming workshop to learn new skills and connect with peers.",
@@ -280,6 +347,7 @@ export function getCampusRecommendations(
   // Take top 2 matching opportunities
   scoredOpps.slice(0, 2).forEach((item) => {
     recommendations.push({
+      id: `rec-opp-${item.opp.id}`,
       type: "opportunity",
       title: `Recommended: ${item.opp.title}`,
       description: item.opp.description,

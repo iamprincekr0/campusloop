@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
+  Briefcase,
   CalendarDays,
   CheckCircle2,
   Circle,
@@ -24,7 +25,7 @@ import {
 import AppShell from "../components/AppShell";
 import CampusPulse from "../components/CampusPulse";
 import { supabase } from "../../lib/supabase";
-import { getCampusRecommendations, OPPORTUNITIES } from "../lib/campus-intelligence";
+import { getCampusRecommendations, matchOpportunity, OPPORTUNITIES } from "../lib/campus-intelligence";
 
 /* ─── types ─── */
 
@@ -227,6 +228,23 @@ export default function DashboardPage() {
       .slice(0, 4);
   }, [events]);
 
+  // Top 2-3 matched opportunities for the dashboard section
+  const topMatchedOpportunities = useMemo(() => {
+    return OPPORTUNITIES.map((opp) => {
+      const match = matchOpportunity(
+        opp,
+        profile?.branch || "",
+        profile?.year || "",
+        profile?.skills || [],
+        projects.length
+      );
+      return { opp, match };
+    })
+      .filter((item) => item.match.matched)
+      .sort((a, b) => b.match.score - a.match.score)
+      .slice(0, 3);
+  }, [profile, projects.length]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -283,10 +301,10 @@ export default function DashboardPage() {
           >
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-450">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400">
                 {attentionItems.length} {attentionItems.length === 1 ? "item needs" : "items need"} your attention
               </h3>
-              <p className="mt-1 text-sm text-slate-305 text-slate-300 leading-normal">
+              <p className="mt-1 text-sm text-slate-300 leading-normal">
                 Complete these actions to unlock better internship, study, and project opportunities on CampusLoop.
               </p>
               <div className="mt-2.5 flex flex-wrap gap-2">
@@ -462,6 +480,55 @@ export default function DashboardPage() {
                 )}
               </DashboardSection>
             </motion.div>
+
+            {/* opportunities for you */}
+            <motion.div variants={itemVariants}>
+              <DashboardSection
+                title="Opportunities for You"
+                icon={Briefcase}
+                actionHref="/opportunities"
+                actionLabel="All opportunities"
+              >
+                {topMatchedOpportunities.length === 0 ? (
+                  <EmptyState
+                    icon={Briefcase}
+                    message="No strong matches yet. Complete your profile to improve recommendations."
+                    cta="Update profile"
+                    href="/profile"
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {topMatchedOpportunities.map(({ opp, match }) => (
+                      <Link
+                        key={opp.id}
+                        href={`/opportunities#${opp.id}`}
+                        className="group flex flex-col gap-2 rounded-2xl border border-slate-900 bg-slate-950/20 p-4 transition-all duration-300 hover:scale-[1.01] hover:border-slate-800 hover:bg-slate-900/10"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="rounded-full bg-slate-900 border border-slate-800 px-2.5 py-0.5 text-[10px] font-bold text-slate-400">
+                            {opp.category}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-400">
+                            <Sparkles className="h-3 w-3" /> Match: {Math.min(match.score, 100)}%
+                          </span>
+                        </div>
+                        <p className="truncate text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors">
+                          {opp.title}
+                        </p>
+                        <p className="line-clamp-2 text-xs text-slate-400 leading-relaxed">
+                          {opp.description}
+                        </p>
+                        {match.reasons.length > 0 && (
+                          <p className="text-[10px] font-bold text-blue-400">
+                            Why it matches: {match.reasons[0]}
+                          </p>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </DashboardSection>
+            </motion.div>
           </div>
 
           {/* ─ right column ─ */}
@@ -470,9 +537,9 @@ export default function DashboardPage() {
             <motion.div variants={itemVariants}>
               <DashboardSection title="What should I do next?" icon={CheckCircle2}>
                 <div className="space-y-4">
-                  {recommendations.slice(0, 4).map((item, index) => (
+                  {recommendations.slice(0, 4).map((item) => (
                     <div
-                      key={index}
+                      key={item.id}
                       className="flex items-start gap-3 rounded-xl p-2 transition duration-200 hover:bg-white/5"
                     >
                       <Circle className={`h-5 w-5 shrink-0 mt-0.5 ${
@@ -503,7 +570,7 @@ export default function DashboardPage() {
                         )}
                         <Link
                           href={item.actionHref}
-                          className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold text-blue-450 hover:text-blue-300 transition"
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 transition"
                         >
                           {item.actionLabel} <ArrowRight className="h-3 w-3" />
                         </Link>
@@ -526,12 +593,12 @@ export default function DashboardPage() {
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                           {formatEventDate(item.date)}
                         </span>
-                        <h4 className="text-sm font-semibold text-slate-250 text-slate-200 leading-snug mt-0.5">
+                        <h4 className="text-sm font-semibold text-slate-200 leading-snug mt-0.5">
                           {item.title}
                         </h4>
                         <Link
                           href={item.href}
-                          className="mt-1 inline-flex items-center gap-1 text-xs text-blue-405 text-blue-400 hover:text-blue-300 transition font-bold"
+                          className="mt-1 inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition font-bold"
                         >
                           Go to page <ArrowRight className="h-3 w-3" />
                         </Link>

@@ -109,10 +109,14 @@ export default function AppShell({
         e.preventDefault();
         setSearchOpen((prev) => !prev);
       }
+      if (e.key === "Escape" && searchOpen) {
+        e.preventDefault();
+        setSearchOpen(false);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [searchOpen]);
 
   // Focus search input when modal opens
   useEffect(() => {
@@ -325,9 +329,9 @@ export default function AppShell({
               className="hidden max-w-xl flex-1 items-center gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/30 px-4 py-2.5 shadow-sm md:flex hover:border-slate-700/50 transition text-left cursor-pointer"
             >
               <Search className="h-4 w-4 text-slate-500" />
-              <span className="text-sm text-slate-500 flex-1">Search projects, events, and opportunities...</span>
+              <span className="text-sm text-slate-500 flex-1">Search campus...</span>
               <kbd className="rounded-md bg-slate-900 border border-slate-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
-                ⌘ K
+                Ctrl K
               </kbd>
             </button>
 
@@ -346,7 +350,6 @@ export default function AppShell({
                 className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-800/60 bg-slate-950/30 text-slate-400 shadow-sm transition hover:text-blue-400 hover:bg-white/5"
               >
                 <Bell className="h-4 w-4" />
-                <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-slate-950" />
               </button>
               <Link
                 href="/profile"
@@ -439,41 +442,54 @@ export default function AppShell({
                     <p className="text-xs mt-1">Try a different search term or check spelling.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {searchResults.map((result) => (
-                      <button
-                        key={`${result.type}-${result.id}`}
-                        onClick={() => {
-                          setSearchOpen(false);
-                          router.push(result.href);
-                        }}
-                        className="w-full text-left flex items-start gap-3 rounded-2xl bg-slate-900/20 hover:bg-slate-900/60 border border-slate-900 hover:border-slate-800/80 p-3.5 transition duration-200"
-                      >
-                        <span className={`grid h-9 w-9 place-items-center rounded-xl shrink-0 ${
-                          result.type === "Opportunity"
-                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                            : result.type === "Event"
-                              ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
-                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                        }`}>
-                          {result.type === "Opportunity" ? (
-                            <Briefcase className="h-4.5 w-4.5" />
-                          ) : result.type === "Event" ? (
-                            <CalendarDays className="h-4.5 w-4.5" />
-                          ) : (
-                            <FileCode className="h-4.5 w-4.5" />
-                          )}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-slate-200 leading-snug">
-                            {result.title}
+                  <div className="space-y-5">
+                    {(["Event", "Project", "Opportunity"] as const).map((group) => {
+                      const groupResults = searchResults.filter((r) => r.type === group);
+                      if (groupResults.length === 0) return null;
+                      return (
+                        <div key={group}>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 mb-2 px-1">
+                            {group}s
                           </p>
-                          <p className="text-xs text-slate-500 mt-1 leading-normal">
-                            {result.description}
-                          </p>
+                          <div className="space-y-2">
+                            {groupResults.map((result) => (
+                              <button
+                                key={`${result.type}-${result.id}`}
+                                onClick={() => {
+                                  setSearchOpen(false);
+                                  router.push(result.href);
+                                }}
+                                className="w-full text-left flex items-start gap-3 rounded-2xl bg-slate-900/20 hover:bg-slate-900/60 border border-slate-900 hover:border-slate-800/80 p-3.5 transition duration-200"
+                              >
+                                <span className={`grid h-9 w-9 place-items-center rounded-xl shrink-0 ${
+                                  result.type === "Opportunity"
+                                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                                    : result.type === "Event"
+                                      ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                                      : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                }`}>
+                                  {result.type === "Opportunity" ? (
+                                    <Briefcase className="h-4 w-4" />
+                                  ) : result.type === "Event" ? (
+                                    <CalendarDays className="h-4 w-4" />
+                                  ) : (
+                                    <FileCode className="h-4 w-4" />
+                                  )}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-bold text-slate-200 leading-snug">
+                                    {result.title}
+                                  </p>
+                                  <p className="text-xs text-slate-500 mt-1 leading-normal">
+                                    {result.description}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

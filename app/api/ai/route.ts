@@ -4,6 +4,17 @@ export async function POST(req: Request) {
   try {
     const { messages, mode, userFullName, profile, projects, recommendations } = await req.json();
 
+    // Auth guard — require a valid Supabase session
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Input validation
+    if (!Array.isArray(messages) || messages.length > 20) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
     const firstName = userFullName
       ? userFullName.trim().split(/\s+/)[0]
       : "Student";

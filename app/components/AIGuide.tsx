@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Send, Download, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getCampusRecommendations } from "../lib/campus-intelligence";
+import { supabase } from "../../lib/supabase";
 
 const MODES = [
   { id: "Study", icon: "📚", label: "Study Guide" },
@@ -128,13 +129,20 @@ How can I help you today?`,
     setInput("");
     setIsLoading(true);
 
+    // Get current session for API auth
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessToken = session?.access_token || "";
+
     try {
       if (isImageRequest) {
         const imagePrompt = userText.replace("/draw", "").trim();
 
         const response = await fetch("/api/image", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+          },
           body: JSON.stringify({ prompt: imagePrompt }),
         });
 
@@ -162,7 +170,10 @@ How can I help you today?`,
 
         const response = await fetch("/api/ai", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+          },
           body: JSON.stringify({
             messages: [
               ...textMessages,

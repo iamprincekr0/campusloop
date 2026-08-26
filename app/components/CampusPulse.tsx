@@ -12,8 +12,8 @@ type CampusPulseProps = {
 type FestivalConfig = {
   title: string;
   message: string;
-  start: string;
-  end: string;
+  startMd: string;
+  endMd: string;
   emoji: string;
   gradient: string;
   accentBar: string;
@@ -23,8 +23,8 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "Happy Republic Day",
     message: "Reflecting on our constitution and building a smarter nation together.",
-    start: "2026-01-25",
-    end: "2026-01-27",
+    startMd: "01-25",
+    endMd: "01-27",
     emoji: "🇮🇳",
     gradient: "from-orange-500/15 via-white/5 to-green-500/15",
     accentBar: "from-orange-500 via-white to-green-500",
@@ -32,8 +32,8 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "Happy Holi",
     message: "Wishing you a bright, colorful, and energetic semester ahead!",
-    start: "2026-03-02",
-    end: "2026-03-04",
+    startMd: "03-02",
+    endMd: "03-04",
     emoji: "🎨",
     gradient: "from-pink-500/15 via-yellow-500/10 to-cyan-500/15",
     accentBar: "from-pink-500 via-yellow-400 to-cyan-500",
@@ -41,8 +41,8 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "Happy Independence Day",
     message: "Celebrating freedom, innovation, and the power of student building.",
-    start: "2026-08-14",
-    end: "2026-08-16",
+    startMd: "08-14",
+    endMd: "08-16",
     emoji: "🇮🇳",
     gradient: "from-orange-500/15 via-white/5 to-green-500/15",
     accentBar: "from-orange-500 via-white to-green-500",
@@ -50,35 +50,35 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "Happy Teacher's Day",
     message: "Thanking the educators and mentors guiding us toward our next big steps.",
-    start: "2026-09-04",
-    end: "2026-09-06",
+    startMd: "09-04",
+    endMd: "09-06",
     emoji: "🍎",
     gradient: "from-blue-500/15 via-indigo-500/10 to-purple-600/15",
     accentBar: "from-blue-500 via-indigo-500 to-purple-600",
   },
   {
-    title: "Happy Ganesh Chaturthi",
-    message: "May this new beginning bring clarity, courage, and progress to your journey.",
-    start: "2026-09-14",
-    end: "2026-09-25",
-    emoji: "🙏",
-    gradient: "from-orange-500/20 via-red-500/15 to-yellow-600/20",
-    accentBar: "from-orange-500 via-red-500 to-yellow-600",
-  },
-  {
     title: "Happy Engineer's Day",
     message: "Celebrating the builders, problem solvers, and engineers shaping our future.",
-    start: "2026-09-14",
-    end: "2026-09-16",
+    startMd: "09-14",
+    endMd: "09-16",
     emoji: "⚙️",
     gradient: "from-slate-700/20 via-slate-800/20 to-slate-950/30",
     accentBar: "from-slate-650 via-slate-750 to-slate-900",
   },
   {
+    title: "Happy Ganesh Chaturthi",
+    message: "May this new beginning bring clarity, courage, and progress to your journey.",
+    startMd: "09-17",
+    endMd: "09-25",
+    emoji: "🙏",
+    gradient: "from-orange-500/20 via-red-500/15 to-yellow-600/20",
+    accentBar: "from-orange-500 via-red-500 to-yellow-600",
+  },
+  {
     title: "Happy Diwali",
     message: "May the festival of lights bring prosperity, learning, and success to you.",
-    start: "2026-11-07",
-    end: "2026-11-10",
+    startMd: "11-07",
+    endMd: "11-10",
     emoji: "🪔",
     gradient: "from-yellow-500/20 via-orange-500/15 to-red-600/20",
     accentBar: "from-yellow-500 via-orange-500 to-red-600",
@@ -86,8 +86,8 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "Mid-Semester Exams",
     message: "Stay focused, take breaks, and tackle one problem statement at a time. You've got this!",
-    start: "2026-10-12",
-    end: "2026-10-17",
+    startMd: "10-12",
+    endMd: "10-17",
     emoji: "📝",
     gradient: "from-blue-600/20 via-violet-600/15 to-indigo-700/20",
     accentBar: "from-blue-500 via-violet-500 to-indigo-650",
@@ -95,8 +95,8 @@ const FESTIVALS: FestivalConfig[] = [
   {
     title: "End-Semester Exams",
     message: "The final stretch of the semester. Keep your focus sharp and finish strong!",
-    start: "2026-12-07",
-    end: "2026-12-19",
+    startMd: "12-07",
+    endMd: "12-19",
     emoji: "🎓",
     gradient: "from-indigo-600/20 via-blue-600/15 to-slate-900/20",
     accentBar: "from-indigo-500 via-blue-500 to-slate-800",
@@ -119,14 +119,6 @@ function getGreeting(hour: number) {
   return "Good evening";
 }
 
-function getLocalDateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
 function getDailyMessage(date: Date) {
   const start = new Date(date.getFullYear(), 0, 1);
   const dayOfYear =
@@ -138,12 +130,14 @@ function getDailyMessage(date: Date) {
 }
 
 function getActiveFestival(date: Date) {
-  const dateKey = getLocalDateKey(date);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const md = `${month}-${day}`;
 
   return FESTIVALS.find(
     (festival) =>
-      dateKey >= festival.start &&
-      dateKey <= festival.end
+      md >= festival.startMd &&
+      md <= festival.endMd
   );
 }
 
@@ -252,7 +246,7 @@ export default function CampusPulse({
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-3.5 w-3.5 text-blue-450" />
+              <Sparkles className="h-3.5 w-3.5 text-blue-400" />
 
               <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-400">
                 CampusPulse
@@ -289,7 +283,7 @@ export default function CampusPulse({
             )}
 
             {whatMattersToday && (
-              <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-500/5 border border-blue-500/10 px-3.5 py-2.5 text-xs text-slate-350">
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-500/5 border border-blue-500/10 px-3.5 py-2.5 text-xs text-slate-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
                 <span>
                   <strong className="text-blue-400 font-bold uppercase tracking-wider text-[9px] mr-1.5">What matters today</strong> 
@@ -302,7 +296,7 @@ export default function CampusPulse({
           <Star
             className={`hidden h-4 w-4 shrink-0 sm:block ${
               pulse.festival
-                ? "text-orange-450 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+                ? "text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
                 : "text-slate-800"
             }`}
           />
