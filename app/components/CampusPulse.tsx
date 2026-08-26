@@ -6,6 +6,7 @@ import { Sparkles, Sun, Star } from "lucide-react";
 
 type CampusPulseProps = {
   fullName: string;
+  whatMattersToday?: string;
 };
 
 type FestivalConfig = {
@@ -148,6 +149,7 @@ function getActiveFestival(date: Date) {
 
 export default function CampusPulse({
   fullName,
+  whatMattersToday,
 }: CampusPulseProps) {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -279,6 +281,16 @@ export default function CampusPulse({
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
                 {pulse.motivation}
               </p>
+            )}
+
+            {whatMattersToday && (
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-500/5 border border-blue-500/10 px-3.5 py-2.5 text-xs text-slate-350">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
+                <span>
+                  <strong className="text-blue-400 font-bold uppercase tracking-wider text-[9px] mr-1.5">What matters today</strong> 
+                  {whatMattersToday}
+                </span>
+              </div>
             )}
           </div>
 

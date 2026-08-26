@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { messages, mode, userFullName, profile, projects } = await req.json();
+    const { messages, mode, userFullName, profile, projects, recommendations } = await req.json();
 
     const firstName = userFullName
       ? userFullName.trim().split(/\s+/)[0]
@@ -25,6 +25,10 @@ export async function POST(req: Request) {
         break;
       case "Opportunity":
         modeGuide = "Identify current internships, hackathons, open-source projects, competitions, and technical programs students should apply for.";
+        break;
+      case "Campus Navigator":
+      case "Navigator":
+        modeGuide = "Help the student navigate their campus journey. Act as their personal campus operating system. Answer questions such as 'What should I do today?', 'What events are relevant to me?', 'What should I work on next?', 'Which opportunity matches my skills?', or 'How can I improve my profile?' Analyze their profile data and projects to suggest concrete next steps. Always mention matching actions and opportunities.";
         break;
       case "Next Step":
         modeGuide = "Outline 2-3 immediate, highly actionable steps the student should take right now to advance their learning or projects.";
@@ -69,15 +73,23 @@ Student Details:
       }
     }
 
-    const systemPrompt = `You are CampusLoop AI, an intelligent student campus assistant.
+    if (recommendations && Array.isArray(recommendations) && recommendations.length > 0) {
+      studentContext += `\nCurrently Recommended Actions & Opportunities:\n`;
+      recommendations.forEach((rec: any) => {
+        studentContext += `- [${rec.priority} Priority] ${rec.title}: ${rec.description} (Route: ${rec.actionHref})\n`;
+      });
+    }
+
+    const systemPrompt = `You are CampusLoop AI, an intelligent student campus assistant and navigator.
 Your goal is to provide practical, motivating, and actionable student guidance.
 You are talking to ${firstName}. Make your responses personalized to them.
 Focus your response on the current active mode: ${mode}. Specifically: ${modeGuide}
 
-Here is the student's real profile/project context. Use it to tailor your response. If they ask about projects or studies, consult this context first. DO NOT invent details that are not provided. If a detail is missing (e.g. no resume uploaded), you can point that out as a logical next step to do:
+Here is the student's real profile, projects, and active intelligence recommendations context. Use it to tailor your response. If they ask about projects, what to do next, or matching opportunities, consult this context first. DO NOT invent details that are not provided. If a detail is missing, point it out as a logical next step (e.g. /profile, /projects/new, /opportunities).
 ${studentContext}
 
 Format your answers with bullet points and bold text where appropriate for readability.
+If you suggest visiting a specific workspace, you MUST mention the route name in your answer so the user knows where to click (e.g. "/profile" to upload a resume or photo, "/projects/new" to add a new project, "/opportunities" to view available matches, "/projects" to see their projects, or "/events/extension-board-2026" to register for events).
 Respond in a friendly, concise, and professional Hinglish style (mostly English mixed with common, clean Hindi written in the English script).
 Do not generate generic chatbot chatter. Give real, practical value.`;
 

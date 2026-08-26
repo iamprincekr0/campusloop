@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  AlertTriangle,
   ArrowRight,
   CalendarDays,
   CheckCircle2,
@@ -17,11 +18,13 @@ import {
   Plus,
   Sparkles,
   UserRound,
+  Clock,
   type LucideIcon,
 } from "lucide-react";
 import AppShell from "../components/AppShell";
 import CampusPulse from "../components/CampusPulse";
 import { supabase } from "../../lib/supabase";
+import { getCampusRecommendations, OPPORTUNITIES } from "../lib/campus-intelligence";
 
 /* ─── types ─── */
 
@@ -32,6 +35,10 @@ type ProfileData = {
   bio: string | null;
   resume_url: string | null;
   avatar_url: string | null;
+  branch: string | null;
+  year: string | null;
+  course: string | null;
+  college: string | null;
 };
 
 type EventRow = {
@@ -51,14 +58,6 @@ type ProjectRow = {
   tech_stack: string[] | null;
   github_url: string | null;
   live_url: string | null;
-};
-
-type ChecklistItem = {
-  id: string;
-  label: string;
-  completed: boolean;
-  href: string;
-  cta: string;
 };
 
 /* ─── helpers ─── */
@@ -107,7 +106,7 @@ export default function DashboardPage() {
       /* 2 — profile stats check */
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("skills, bio, resume_url, avatar_url")
+        .select("skills, bio, resume_url, avatar_url, branch, year, course, college")
         .eq("id", authUser.id)
         .single();
 
@@ -168,44 +167,65 @@ export default function DashboardPage() {
     router.refresh();
   }
 
-  // Actionable dynamic checklist for student guidance
-  const checklist = useMemo<ChecklistItem[]>(() => {
-    const list: ChecklistItem[] = [];
+  // Generate dynamic, data-driven campus recommendations
+  const recommendations = useMemo(() => {
+    return getCampusRecommendations(
+      profile,
+      projects,
+      events
+    );
+  }, [profile, projects, events]);
 
-    list.push({
-      id: "projects",
-      label: "Showcase a project to highlight your skills",
-      completed: projects.length > 0,
-      href: "/projects/new",
-      cta: "Add project",
+  // Filters for High Priority Attention items
+  const attentionItems = useMemo(() => {
+    return recommendations.filter((rec) => rec.priority === "High");
+  }, [recommendations]);
+
+  // Determine what matters today deterministically
+  const whatMattersToday = useMemo(() => {
+    if (attentionItems.length > 0) {
+      return `${attentionItems[0].title}. Action is required.`;
+    }
+    const nextEvent = events.find((e) => e.registration_open);
+    if (nextEvent) {
+      return `Registration is open for ${nextEvent.title}.`;
+    }
+    return "Explore new matches in the Opportunities tab!";
+  }, [attentionItems, events]);
+
+  // Combined chronological Coming Up timeline of events and opportunities
+  const comingUpTimeline = useMemo(() => {
+    const items: {
+      type: "event" | "opportunity";
+      title: string;
+      date: string;
+      href: string;
+    }[] = [];
+
+    events.forEach((e) => {
+      if (e.event_date) {
+        items.push({
+          type: "event",
+          title: e.title,
+          date: e.event_date,
+          href: `/events/${e.slug}`,
+        });
+      }
     });
 
-    list.push({
-      id: "avatar",
-      label: "Upload a profile photo for peers and recruiters",
-      completed: !!profile?.avatar_url,
-      href: "/profile",
-      cta: "Upload photo",
+    OPPORTUNITIES.forEach((opp) => {
+      items.push({
+        type: "opportunity",
+        title: opp.title,
+        date: opp.deadline,
+        href: `/opportunities#${opp.id}`,
+      });
     });
 
-    list.push({
-      id: "resume",
-      label: "Upload a resume PDF to prepare for matching",
-      completed: !!profile?.resume_url,
-      href: "/profile",
-      cta: "Upload resume",
-    });
-
-    list.push({
-      id: "skills_bio",
-      label: "Add technical skills and a brief bio",
-      completed: !!(profile?.bio && profile?.skills && profile.skills.length > 0),
-      href: "/profile",
-      cta: "Update profile",
-    });
-
-    return list;
-  }, [projects, profile]);
+    return items
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 4);
+  }, [events]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -244,7 +264,7 @@ export default function DashboardPage() {
       onLogout={handleLogout}
       loggingOut={loggingOut}
     >
-      <motion.section 
+      <motion.section
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -252,12 +272,41 @@ export default function DashboardPage() {
       >
         {/* ── personalized greeting ── */}
         <motion.div variants={itemVariants}>
-          <CampusPulse fullName={user.fullName} />
+          <CampusPulse fullName={user.fullName} whatMattersToday={whatMattersToday} />
         </motion.div>
 
+        {/* ── in-app attention banner system ── */}
+        {attentionItems.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            className="mb-6 rounded-[22px] border border-amber-900/40 bg-amber-500/5 px-5 py-4 flex items-start gap-3.5"
+          >
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-450">
+                {attentionItems.length} {attentionItems.length === 1 ? "item needs" : "items need"} your attention
+              </h3>
+              <p className="mt-1 text-sm text-slate-305 text-slate-300 leading-normal">
+                Complete these actions to unlock better internship, study, and project opportunities on CampusLoop.
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {attentionItems.map((item, idx) => (
+                  <Link
+                    key={idx}
+                    href={item.actionHref}
+                    className="inline-flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 px-2.5 py-1 rounded-lg text-xs font-semibold text-amber-400 transition"
+                  >
+                    {item.title} <ArrowRight className="h-3 w-3" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* ── quick actions ── */}
-        <motion.div 
-          variants={itemVariants} 
+        <motion.div
+          variants={itemVariants}
           className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4"
         >
           <QuickAction
@@ -417,38 +466,75 @@ export default function DashboardPage() {
 
           {/* ─ right column ─ */}
           <div className="space-y-6">
-            {/* what should i do next? Checklist */}
+            {/* dynamic checklist */}
             <motion.div variants={itemVariants}>
               <DashboardSection title="What should I do next?" icon={CheckCircle2}>
                 <div className="space-y-4">
-                  {checklist.map((item) => (
+                  {recommendations.slice(0, 4).map((item, index) => (
                     <div
-                      key={item.id}
-                      className="flex items-start gap-3 rounded-xl p-2 transition duration-255 hover:bg-white/5"
+                      key={index}
+                      className="flex items-start gap-3 rounded-xl p-2 transition duration-200 hover:bg-white/5"
                     >
-                      {item.completed ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-450 shrink-0 mt-0.5" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-slate-700 shrink-0 mt-0.5" />
-                      )}
+                      <Circle className={`h-5 w-5 shrink-0 mt-0.5 ${
+                        item.priority === "High"
+                          ? "text-red-500/70"
+                          : "text-slate-700"
+                      }`} />
                       <div className="min-w-0 flex-1">
-                        <p
-                          className={`text-sm font-medium leading-relaxed ${
-                            item.completed
-                              ? "text-slate-500 line-through"
-                              : "text-slate-300"
-                          }`}
-                        >
-                          {item.label}
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-slate-200">
+                            {item.title}
+                          </p>
+                          <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                            item.priority === "High"
+                              ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                              : "bg-slate-900 text-slate-500"
+                          }`}>
+                            {item.priority}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-slate-400 leading-relaxed">
+                          {item.description}
                         </p>
-                        {!item.completed && (
-                          <Link
-                            href={item.href}
-                            className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 transition"
-                          >
-                            {item.cta} <ArrowRight className="h-3 w-3" />
-                          </Link>
+                        {item.matchReason && (
+                          <p className="mt-1 text-[10px] font-bold text-blue-400">
+                            Match reason: {item.matchReason}
+                          </p>
                         )}
+                        <Link
+                          href={item.actionHref}
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold text-blue-450 hover:text-blue-300 transition"
+                        >
+                          {item.actionLabel} <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </DashboardSection>
+            </motion.div>
+
+            {/* coming up chronological timeline */}
+            <motion.div variants={itemVariants}>
+              <DashboardSection title="Coming Up" icon={Clock}>
+                <div className="relative pl-4 border-l border-slate-900 space-y-5">
+                  {comingUpTimeline.map((item, index) => (
+                    <div key={index} className="relative">
+                      {/* Timeline dot */}
+                      <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-slate-900 border border-slate-800" />
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          {formatEventDate(item.date)}
+                        </span>
+                        <h4 className="text-sm font-semibold text-slate-250 text-slate-200 leading-snug mt-0.5">
+                          {item.title}
+                        </h4>
+                        <Link
+                          href={item.href}
+                          className="mt-1 inline-flex items-center gap-1 text-xs text-blue-405 text-blue-400 hover:text-blue-300 transition font-bold"
+                        >
+                          Go to page <ArrowRight className="h-3 w-3" />
+                        </Link>
                       </div>
                     </div>
                   ))}
@@ -457,7 +543,7 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* campus intelligence promo */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               className="rounded-[28px] bg-gradient-to-br from-slate-900/60 to-slate-950/80 border border-slate-800/40 p-6 text-white shadow-xl"
             >
@@ -493,6 +579,11 @@ export default function DashboardPage() {
                     label="Events available"
                     value={events.length}
                     href="/events/extension-board-2026"
+                  />
+                  <ProgressRow
+                    label="Opportunities available"
+                    value={OPPORTUNITIES.length}
+                    href="/opportunities"
                   />
                 </div>
               </DashboardSection>

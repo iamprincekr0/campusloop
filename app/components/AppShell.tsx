@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   BookOpen,
+  Briefcase,
   CalendarDays,
   ChevronRight,
   Compass,
+  FileCode,
   GraduationCap,
   LayoutDashboard,
   LogOut,
@@ -16,8 +18,11 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState, useMemo, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import PremiumBackground from "./PremiumBackground";
+import { supabase } from "../../lib/supabase";
+import { OPPORTUNITIES } from "../lib/campus-intelligence";
 
 type AppShellProps = {
   children: ReactNode;
@@ -31,9 +36,18 @@ type AppShellProps = {
 const primaryNavigation = [
   { label: "Home", href: "/dashboard", icon: LayoutDashboard },
   { label: "Explore", href: "/events/extension-board-2026", icon: Compass },
+  { label: "Opportunities", href: "/opportunities", icon: Briefcase },
   { label: "My projects", href: "/projects", icon: BookOpen },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
+
+type SearchResultItem = {
+  id: string;
+  type: "Event" | "Project" | "Opportunity";
+  title: string;
+  description: string;
+  href: string;
+};
 
 export default function AppShell({
   children,
@@ -44,12 +58,128 @@ export default function AppShell({
   loggingOut = false,
 }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /* ── Search State ── */
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dbEvents, setDbEvents] = useState<{ slug: string; title: string }[]>([]);
+  const [dbProjects, setDbProjects] = useState<{ id: string; title: string; description: string | null }[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   function isActive(href: string) {
     if (href === "/dashboard") return pathname === href;
     return pathname.startsWith(href);
   }
+
+  // Load search index data
+  useEffect(() => {
+    let active = true;
+    async function loadIndexData() {
+      // 1. Fetch events
+      const { data: eventsData } = await supabase
+        .from("events")
+        .select("slug, title")
+        .eq("is_published", true);
+
+      if (active && eventsData) setDbEvents(eventsData);
+
+      // 2. Fetch user's own projects
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: projectsData } = await supabase
+          .from("projects")
+          .select("id, title, description")
+          .eq("user_id", user.id);
+
+        if (active && projectsData) setDbProjects(projectsData);
+      }
+    }
+    void loadIndexData();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Hotkey listener for Ctrl/Cmd + K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Focus search input when modal opens
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    } else {
+      setSearchQuery("");
+    }
+  }, [searchOpen]);
+
+  // Client-side search filters
+  const searchResults = useMemo<SearchResultItem[]>(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase().trim();
+
+    const results: SearchResultItem[] = [];
+
+    // Search Opportunities
+    OPPORTUNITIES.forEach((opp) => {
+      if (
+        opp.title.toLowerCase().includes(query) ||
+        opp.description.toLowerCase().includes(query) ||
+        opp.category.toLowerCase().includes(query)
+      ) {
+        results.push({
+          id: opp.id,
+          type: "Opportunity",
+          title: opp.title,
+          description: `${opp.category} · Apply by ${opp.deadline}`,
+          href: `/opportunities#${opp.id}`,
+        });
+      }
+    });
+
+    // Search Events
+    dbEvents.forEach((evt) => {
+      if (evt.title.toLowerCase().includes(query)) {
+        results.push({
+          id: evt.slug,
+          type: "Event",
+          title: evt.title,
+          description: "Campus workshop / activity details",
+          href: `/events/${evt.slug}`,
+        });
+      }
+    });
+
+    // Search Projects
+    dbProjects.forEach((proj) => {
+      if (
+        proj.title.toLowerCase().includes(query) ||
+        (proj.description && proj.description.toLowerCase().includes(query))
+      ) {
+        results.push({
+          id: proj.id,
+          type: "Project",
+          title: proj.title,
+          description: proj.description || "Student engineering portfolio project",
+          href: "/projects",
+        });
+      }
+    });
+
+    return results;
+  }, [searchQuery, dbEvents, dbProjects]);
 
   return (
     <main className="min-h-screen text-slate-100 relative">
@@ -153,7 +283,7 @@ export default function AppShell({
             href="/profile"
             className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-white/5"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-slate-700/50 text-sm font-bold text-blue-300">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-slate-700/50 text-sm font-bold text-blue-300">
               {initials}
             </span>
             <span className="min-w-0 flex-1">
@@ -190,23 +320,23 @@ export default function AppShell({
               <Menu className="h-5 w-5" />
             </button>
             
-            <label className="hidden max-w-xl flex-1 items-center gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/30 px-4 py-2.5 shadow-sm md:flex focus-within:border-blue-500/50 transition">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="hidden max-w-xl flex-1 items-center gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/30 px-4 py-2.5 shadow-sm md:flex hover:border-slate-700/50 transition text-left cursor-pointer"
+            >
               <Search className="h-4 w-4 text-slate-500" />
-              <input
-                className="w-full bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
-                placeholder="Search projects, people, events, and resources"
-                type="search"
-              />
+              <span className="text-sm text-slate-500 flex-1">Search projects, events, and opportunities...</span>
               <kbd className="rounded-md bg-slate-900 border border-slate-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
                 ⌘ K
               </kbd>
-            </label>
+            </button>
 
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
+                onClick={() => setSearchOpen(true)}
                 aria-label="Search"
-                className="grid h-10 w-10 place-items-center rounded-xl border border-slate-800/60 bg-slate-950/30 text-slate-400 shadow-sm md:hidden hover:bg-white/5"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-slate-800/60 bg-slate-950/30 text-slate-400 shadow-sm md:hidden hover:bg-white/5 cursor-pointer"
               >
                 <Search className="h-4 w-4" />
               </button>
@@ -252,6 +382,105 @@ export default function AppShell({
           );
         })}
       </nav>
+
+      {/* Global Search Modal Overlay */}
+      <AnimatePresence>
+        {searchOpen && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4">
+            {/* Backdrop */}
+            <motion.button
+              type="button"
+              aria-label="Close search"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSearchOpen(false)}
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-md cursor-default outline-none"
+            />
+
+            {/* Search Box Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-xl z-10 flex flex-col max-h-[70vh]"
+            >
+              {/* Header Input */}
+              <div className="flex items-center gap-3 border-b border-slate-900 pb-4 mb-4">
+                <Search className="h-5 w-5 text-slate-500 shrink-0" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Type to search events, projects, and opportunities..."
+                  className="w-full bg-transparent text-slate-200 outline-none text-base placeholder:text-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="grid h-8 w-8 place-items-center rounded-xl hover:bg-white/5 text-slate-500 hover:text-slate-350 transition shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Search Results Display */}
+              <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
+                {searchQuery.trim() === "" ? (
+                  <div className="py-8 text-center text-slate-500">
+                    <p className="text-sm font-semibold">Search CampusLoop workspace</p>
+                    <p className="text-xs mt-1">Start typing to filter matching opportunities, workshops, and projects.</p>
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500">
+                    <p className="text-sm font-semibold">No results match your query</p>
+                    <p className="text-xs mt-1">Try a different search term or check spelling.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {searchResults.map((result) => (
+                      <button
+                        key={`${result.type}-${result.id}`}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          router.push(result.href);
+                        }}
+                        className="w-full text-left flex items-start gap-3 rounded-2xl bg-slate-900/20 hover:bg-slate-900/60 border border-slate-900 hover:border-slate-800/80 p-3.5 transition duration-200"
+                      >
+                        <span className={`grid h-9 w-9 place-items-center rounded-xl shrink-0 ${
+                          result.type === "Opportunity"
+                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            : result.type === "Event"
+                              ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        }`}>
+                          {result.type === "Opportunity" ? (
+                            <Briefcase className="h-4.5 w-4.5" />
+                          ) : result.type === "Event" ? (
+                            <CalendarDays className="h-4.5 w-4.5" />
+                          ) : (
+                            <FileCode className="h-4.5 w-4.5" />
+                          )}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-slate-200 leading-snug">
+                            {result.title}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-1 leading-normal">
+                            {result.description}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

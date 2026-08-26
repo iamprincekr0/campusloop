@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Send, Download } from "lucide-react";
+import { Sparkles, Send, Download, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { getCampusRecommendations } from "../lib/campus-intelligence";
 
 const MODES = [
   { id: "Study", icon: "📚", label: "Study Guide" },
   { id: "Project", icon: "🚀", label: "Project Help" },
+  { id: "Campus Navigator", icon: "🧭", label: "Campus Navigator" },
   { id: "Career", icon: "💼", label: "Career Advice" },
   { id: "Campus", icon: "🏫", label: "Campus Life" },
   { id: "Opportunity", icon: "✨", label: "Opportunities" },
@@ -33,15 +36,17 @@ type AIGuideProps = {
   userFullName: string;
   profile: ProfileData;
   projects: ProjectData[];
+  upcomingEvents?: any[];
 };
 
 export default function AIGuide({
   userFullName,
   profile,
   projects,
+  upcomingEvents = [],
 }: AIGuideProps) {
   const firstName = userFullName.trim().split(/\s+/)[0] || "Student";
-  const [activeMode, setActiveMode] = useState("Study");
+  const [activeMode, setActiveMode] = useState("Campus Navigator");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
@@ -49,12 +54,66 @@ export default function AIGuide({
       role: "assistant",
       content: `Hello ${firstName}! I am CampusLoop AI, your campus guide.
 
-Select any of the modes above to focus our discussion. If you need engineering diagrams, study visuals, project visuals, or event creatives, type '/draw' followed by your prompt.
+Select any of the modes above to focus our discussion. Choose 'Campus Navigator' for tailored suggestions based on your branch and skills.
 
 How can I help you today?`,
       type: "text",
     },
   ]);
+
+  // Compute student recommendations based on their current profile/project state
+  const currentRecommendations = useMemo(() => {
+    const p = profile
+      ? {
+          skills: profile.skills,
+          bio: profile.bio,
+          resume_url: profile.resume_url,
+          avatar_url: null, // AI guide page is enough without avatar check details
+          branch: profile.branch,
+          year: profile.year,
+          course: profile.course,
+        }
+      : null;
+
+    const projs = projects.map((proj) => ({
+      id: "proj-dummy",
+      title: proj.title,
+      description: proj.description,
+      tech_stack: proj.tech_stack,
+      github_url: null,
+      live_url: null,
+    }));
+
+    const evts = upcomingEvents.map((evt) => ({
+      id: evt.id || "evt-dummy",
+      slug: evt.slug || "extension-board-2026",
+      title: evt.title || "Upcoming Event",
+      registration_open: evt.registration_open ?? true,
+    }));
+
+    return getCampusRecommendations(p, projs, evts);
+  }, [profile, projects, upcomingEvents]);
+
+  // Parse links from message content to generate quick actions
+  const getActionButtons = (content: string) => {
+    const buttons: { label: string; href: string }[] = [];
+    if (content.includes("/profile")) {
+      buttons.push({ label: "Complete Profile", href: "/profile" });
+    }
+    if (content.includes("/projects/new")) {
+      buttons.push({ label: "Create Project", href: "/projects/new" });
+    }
+    if (content.includes("/opportunities")) {
+      buttons.push({ label: "Explore Opportunities", href: "/opportunities" });
+    }
+    if (content.includes("/projects") && !content.includes("/projects/new")) {
+      buttons.push({ label: "Open My Projects", href: "/projects" });
+    }
+    if (content.includes("/events")) {
+      buttons.push({ label: "View Events", href: "/events/extension-board-2026" });
+    }
+    return buttons;
+  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +172,7 @@ How can I help you today?`,
             userFullName,
             profile,
             projects,
+            recommendations: currentRecommendations,
           }),
         });
 
@@ -175,44 +235,62 @@ How can I help you today?`,
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-950/10 scrollbar-thin relative z-10">
         <AnimatePresence initial={false}>
-          {messages.map((msg, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`flex ${
-                msg.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  msg.role === "user"
-                    ? "bg-blue-600/90 text-white rounded-br-none shadow-[0_4px_15px_rgba(59,130,246,0.25)]"
-                    : "bg-slate-900/50 text-slate-200 border border-slate-800/40 rounded-bl-none shadow-inner"
+          {messages.map((msg, index) => {
+            const actions = msg.role === "assistant" && msg.type === "text" ? getActionButtons(msg.content) : [];
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`flex flex-col ${
+                  msg.role === "user" ? "items-end" : "items-start"
                 }`}
               >
-                {msg.type === "image" ? (
-                  <div className="relative w-full overflow-hidden rounded-xl mt-1 group">
-                    <img
-                      src={msg.content}
-                      alt="Generated Visual"
-                      className="w-full h-auto object-cover rounded-xl shadow-md border border-slate-800/50 transition duration-500 group-hover:scale-[1.01]"
-                    />
-                    <a
-                      href={msg.content}
-                      download="campusloop-ai-diagram.jpg"
-                      className="absolute bottom-2.5 right-2.5 bg-slate-950/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-slate-950 transition backdrop-blur-sm shadow-md border border-slate-800/30 flex items-center gap-1.5"
-                    >
-                      <Download className="h-3 w-3" /> Download
-                    </a>
+                <div
+                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    msg.role === "user"
+                      ? "bg-blue-600/90 text-white rounded-br-none shadow-[0_4px_15px_rgba(59,130,246,0.25)]"
+                      : "bg-slate-900/50 text-slate-200 border border-slate-800/40 rounded-bl-none shadow-inner"
+                  }`}
+                >
+                  {msg.type === "image" ? (
+                    <div className="relative w-full overflow-hidden rounded-xl mt-1 group">
+                      <img
+                        src={msg.content}
+                        alt="Generated Visual"
+                        className="w-full h-auto object-cover rounded-xl shadow-md border border-slate-800/50 transition duration-500 group-hover:scale-[1.01]"
+                      />
+                      <a
+                        href={msg.content}
+                        download="campusloop-ai-diagram.jpg"
+                        className="absolute bottom-2.5 right-2.5 bg-slate-950/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full hover:bg-slate-950 transition backdrop-blur-sm shadow-md border border-slate-800/30 flex items-center gap-1.5"
+                      >
+                        <Download className="h-3 w-3" /> Download
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  )}
+                </div>
+
+                {/* Render Quick Action buttons if parsed */}
+                {actions.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    {actions.map((act) => (
+                      <Link
+                        key={act.href}
+                        href={act.href}
+                        className="inline-flex items-center gap-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm hover:scale-[1.02]"
+                      >
+                        {act.label} <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    ))}
                   </div>
-                ) : (
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
                 )}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {/* Loading Indicator */}

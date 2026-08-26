@@ -29,6 +29,7 @@ export default function AIPage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -74,6 +75,16 @@ export default function AIPage() {
         setProjects(projectsData as ProjectData[]);
       }
 
+      // Fetch upcoming events
+      const { data: eventsData } = await supabase
+        .from("events")
+        .select("id, slug, title, registration_open")
+        .eq("is_published", true);
+
+      if (active && eventsData) {
+        setEvents(eventsData);
+      }
+
       if (active) setLoading(false);
     }
 
@@ -108,9 +119,9 @@ export default function AIPage() {
 
   if (loading || !user) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f7f8fc]">
+      <main className="grid min-h-screen place-items-center bg-[#050816]">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
           <p className="mt-4 text-sm font-medium text-slate-500">
             Loading AI Guide...
           </p>
@@ -129,13 +140,13 @@ export default function AIPage() {
     >
       <section className="mx-auto max-w-[1540px] px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-10">
         <div className="mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-600">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-400">
             Campus Intelligence
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-slate-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold tracking-[-0.05em] text-white sm:text-4xl">
             CampusLoop AI Guide
           </h1>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
             Your personalized guide for study, project help, career pathing, opportunities, and next steps.
           </p>
         </div>
@@ -145,6 +156,7 @@ export default function AIPage() {
             userFullName={user.fullName}
             profile={profile}
             projects={projects}
+            upcomingEvents={events}
           />
         </div>
       </section>
