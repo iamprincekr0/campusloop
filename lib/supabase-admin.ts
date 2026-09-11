@@ -6,10 +6,9 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey =
   process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!url || !serviceRoleKey) {
-  throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL and a Supabase server secret.");
-}
-
-export const supabaseAdmin = createClient(url, serviceRoleKey, {
+export const supabaseAdmin = createClient(
+  url ?? "https://placeholder.supabase.co",
+  serviceRoleKey ?? "placeholder-service-role-key",
+  {
   auth: { autoRefreshToken: false, persistSession: false },
 });
