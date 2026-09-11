@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Eye, EyeOff, GraduationCap, LockKeyhole, Mail, UserRound } from "lucide-react";
 import AuthShell from "../components/AuthShell";
-import { supabase } from "../../lib/supabase";
+import { isSupabaseConfigured, supabase } from "../../lib/supabase";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -23,6 +23,11 @@ export default function SignupPage() {
     if (fullName.trim().length < 2) { setIsError(true); setMessage("Please enter your full name."); return; }
     if (password.length < 8) { setIsError(true); setMessage("Password must contain at least 8 characters."); return; }
     if (!acceptedTerms) { setIsError(true); setMessage("Please accept the Terms and Privacy Policy."); return; }
+    if (!isSupabaseConfigured) {
+      setIsError(true);
+      setMessage("Account creation is unavailable until Supabase is connected.");
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: fullName.trim() } } });
     setLoading(false);
