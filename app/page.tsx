@@ -248,7 +248,7 @@ export default function HomePage() {
         <SectionIntro eyebrow="One connected campus" title="The student experience should not be split across a dozen tabs." description="CampusLoop creates one intentional home for every signal, relationship, and next step that matters." />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="mt-10 grid gap-5 md:grid-cols-3">
           {features.map((feature) => (
-            <motion.article variants={fadeUp} key={feature.title} className={`group rounded-[28px] bg-slate-900/20 p-6 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-slate-800 ${feature.tone} sm:p-7`}>
+            <motion.article variants={fadeUp} key={feature.title} className={`premium-surface group rounded-[28px] bg-slate-900/20 p-6 transition duration-300 ${feature.tone} sm:p-7`}>
               <span className={`grid h-12 w-12 place-items-center rounded-2xl ${feature.iconTone}`}>
                 <feature.icon className="h-5 w-5" />
               </span>

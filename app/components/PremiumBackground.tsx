@@ -2,14 +2,27 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export default function PremiumBackground() {
   const shouldReduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const springX = useSpring(pointerX, { stiffness: 70, damping: 22 });
+  const springY = useSpring(pointerY, { stiffness: 70, damping: 22 });
+  const layerX = useTransform(springX, [-1, 1], [-18, 18]);
+  const layerY = useTransform(springY, [-1, 1], [-12, 12]);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const handlePointerMove = (event: PointerEvent) => {
+      pointerX.set((event.clientX / window.innerWidth - 0.5) * 2);
+      pointerY.set((event.clientY / window.innerHeight - 0.5) * 2);
+    };
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, [pointerX, pointerY]);
 
   if (!mounted) {
     return <div className="fixed inset-0 -z-20 bg-[#050816]" />;
@@ -62,9 +75,21 @@ export default function PremiumBackground() {
   };
 
   return (
-    <div className="fixed inset-0 -z-20 overflow-hidden bg-[#050816]">
-      {/* Dynamic ambient dark overlay with noise/depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(15,23,42,0.6),rgba(5,8,22,0.95))]" />
+    <div
+      className="fixed inset-0 -z-20 overflow-hidden bg-[#050816]"
+      aria-hidden="true"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(15,23,42,0.62),rgba(5,8,22,0.96))]" />
+
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-[42%] h-[680px] w-[1100px] -translate-x-1/2 -translate-y-1/2 [perspective:900px]"
+        style={{ x: layerX, y: layerY }}
+      >
+        <div className="absolute inset-0 rounded-[50%] border border-blue-400/10 [transform:rotateX(62deg)_rotateZ(-18deg)] [box-shadow:0_0_80px_rgba(37,99,235,0.08),inset_0_0_80px_rgba(37,99,235,0.05)]" />
+        <div className="absolute inset-[10%] rounded-[50%] border border-cyan-300/10 [transform:rotateX(62deg)_rotateZ(-18deg)]" />
+        <div className="absolute left-[20%] top-[22%] h-24 w-44 rounded-2xl border border-cyan-300/20 bg-cyan-200/[0.03] shadow-[0_20px_80px_rgba(34,211,238,0.08)] [transform:rotateX(58deg)_rotateY(-16deg)_rotateZ(-18deg)]" />
+        <div className="absolute bottom-[18%] right-[18%] h-20 w-36 rounded-2xl border border-blue-300/15 bg-blue-200/[0.03] shadow-[0_20px_80px_rgba(59,130,246,0.08)] [transform:rotateX(58deg)_rotateY(18deg)_rotateZ(-18deg)]" />
+      </motion.div>
       
       {/* Blurred gradient orbs */}
       <motion.div
