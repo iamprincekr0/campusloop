@@ -1,8 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export default function PremiumBackground() {
   const shouldReduceMotion = useReducedMotion();

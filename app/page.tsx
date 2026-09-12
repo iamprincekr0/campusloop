@@ -178,7 +178,7 @@ export default function HomePage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">Thursday, August 20</p>
                   <div className="mt-3 flex items-end justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-bold tracking-tight text-white">Good morning, Aarav.</h2>
+                      <h2 className="text-xl font-bold tracking-tight text-white">Good morning, student.</h2>
                       <p className="mt-1 text-xs text-slate-400">Your campus world is moving.</p>
                     </div>
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-blue-300 border border-white/5">
@@ -186,9 +186,9 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div className="mt-5 grid grid-cols-3 gap-2">
-                    <MiniStat value="12" label="Matches" />
-                    <MiniStat value="3" label="Events" />
-                    <MiniStat value="68%" label="Profile" />
+                    <MiniStat value="Workspace" label="Your campus home" />
+                    <MiniStat value="Live" label="Events and updates" />
+                    <MiniStat value="Ready" label="Profile and progress" />
                   </div>
                 </div>
                 
