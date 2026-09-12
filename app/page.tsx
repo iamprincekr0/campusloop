@@ -17,7 +17,6 @@ import {
   Play,
   Search,
   Sparkles,
-  Star,
   Trophy,
   Users,
   X,
@@ -43,12 +42,6 @@ const steps = [
   { number: "01", title: "Build your student profile", description: "Your interests, skills, course, and goals create a workspace that feels personal from day one.", icon: GraduationCap, tone: "bg-blue-600" },
   { number: "02", title: "Explore your campus universe", description: "Use one calm, searchable home for events, teams, resources, and opportunities.", icon: Search, tone: "bg-violet-600" },
   { number: "03", title: "Make progress visible", description: "Share projects, join the right rooms, and keep track of what moves you forward.", icon: Sparkles, tone: "bg-emerald-600" },
-];
-
-const testimonials = [
-  { quote: "I found two teammates for our energy-monitoring prototype and a mentor who helped us improve the demo.", name: "Aarav Mehta", detail: "Electrical Engineering · 3rd year", initials: "AM", color: "from-blue-500/20 to-cyan-500/20 border border-blue-500/20" },
-  { quote: "CampusLoop makes opportunities feel discoverable instead of buried in ten different WhatsApp groups.", name: "Nandini Rao", detail: "Computer Science · 2nd year", initials: "NR", color: "from-violet-500/20 to-fuchsia-500/20 border border-violet-500/20" },
-  { quote: "Our club finally has one space for applications, event updates, project teams, and resources.", name: "Karan Shah", detail: "Robotics Club Lead", initials: "KS", color: "from-emerald-500/20 to-teal-500/20 border border-emerald-500/20" },
 ];
 
 const faqs = [
@@ -175,10 +168,10 @@ export default function HomePage() {
                 </div>
                 
                 <div className="mt-6 rounded-2xl bg-slate-950/90 border border-slate-900/80 p-5 text-white">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">Thursday, August 20</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">Your campus workspace</p>
                   <div className="mt-3 flex items-end justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-bold tracking-tight text-white">Good morning, Aarav.</h2>
+                      <h2 className="text-xl font-bold tracking-tight text-white">A clearer place to move forward.</h2>
                       <p className="mt-1 text-xs text-slate-400">Your campus world is moving.</p>
                     </div>
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-blue-300 border border-white/5">
@@ -186,9 +179,9 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div className="mt-5 grid grid-cols-3 gap-2">
-                    <MiniStat value="12" label="Matches" />
-                    <MiniStat value="3" label="Events" />
-                    <MiniStat value="68%" label="Profile" />
+                    <MiniStat value="Workspace" label="Your campus home" />
+                    <MiniStat value="Live" label="Events and updates" />
+                    <MiniStat value="Ready" label="Profile and progress" />
                   </div>
                 </div>
                 
@@ -198,8 +191,8 @@ export default function HomePage() {
                       <p className="text-xs font-bold text-slate-300">For you</p>
                       <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
                     </div>
-                    <DashboardRow icon={Zap} color="bg-emerald-950/50 text-emerald-400 border border-emerald-500/20" title="EV battery internship" meta="Apply by Aug 24" />
-                    <DashboardRow icon={Users} color="bg-violet-950/50 text-violet-400 border border-violet-500/20" title="Embedded Builders" meta="3.2K members" />
+                    <DashboardRow icon={Zap} color="bg-emerald-950/50 text-emerald-400 border border-emerald-500/20" title="Opportunities that fit" meta="Discover what is next" />
+                    <DashboardRow icon={Users} color="bg-violet-950/50 text-violet-400 border border-violet-500/20" title="Communities and teams" meta="Find your people" />
                   </div>
                   
                   <div className="rounded-2xl border border-slate-950/80 bg-slate-950/30 p-4">
@@ -346,26 +339,14 @@ export default function HomePage() {
 
       <section className="border-y border-slate-900 bg-slate-950/30 backdrop-blur-sm py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionIntro eyebrow="Made for real momentum" title="A better kind of campus network." description="Students do their best work when useful people and useful opportunities are easy to find." />
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <figure key={testimonial.name} className="rounded-[28px] border border-slate-800/40 bg-slate-900/10 p-6">
-                <div className="flex gap-1 text-amber-400">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star key={index} className="h-3.5 w-3.5 fill-current" />
-                  ))}
-                </div>
-                <blockquote className="mt-5 text-base font-semibold leading-7 tracking-[-0.015em] text-slate-200">“{testimonial.quote}”</blockquote>
-                <figcaption className="mt-7 flex items-center gap-3">
-                  <span className={`grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${testimonial.color} text-xs font-bold text-slate-300`}>
-                    {testimonial.initials}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-bold text-slate-200">{testimonial.name}</span>
-                    <span className="mt-0.5 block text-xs text-slate-500">{testimonial.detail}</span>
-                  </span>
-                </figcaption>
-              </figure>
+          <SectionIntro eyebrow="Designed for momentum" title="A better kind of campus network." description="CampusLoop gives students one intentional home for learning, projects, communities, events, and opportunities." />
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {["Learn with context", "Build with people", "Return with direction"].map((title, index) => (
+              <article key={title} className="premium-surface rounded-[28px] border border-slate-800/40 bg-slate-900/10 p-6">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-blue-400">0{index + 1}</span>
+                <h3 className="mt-6 text-xl font-bold text-white">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{["Keep your academic interests, goals, and useful resources connected.", "Make projects, communities, and opportunities easier to discover.", "See a clear next step without turning student life into a KPI dashboard."][index]}</p>
+              </article>
             ))}
           </div>
         </div>

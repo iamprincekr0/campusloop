@@ -35,7 +35,7 @@ type AppShellProps = {
 
 const primaryNavigation = [
   { label: "Home", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Explore", href: "/events/extension-board-2026", icon: Compass },
+  { label: "Events", href: "/events", icon: Compass },
   { label: "Opportunities", href: "/opportunities", icon: Briefcase },
   { label: "My projects", href: "/projects", icon: BookOpen },
   { label: "Profile", href: "/profile", icon: UserRound },
@@ -186,7 +186,7 @@ export default function AppShell({
   }, [searchQuery, dbEvents, dbProjects]);
 
   return (
-    <main className="min-h-screen text-slate-100 relative">
+    <main className="relative min-h-screen text-slate-100">
       {/* Cinematic animated background */}
       <PremiumBackground />
 

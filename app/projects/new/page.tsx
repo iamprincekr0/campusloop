@@ -226,7 +226,7 @@ export default function NewProjectPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-650 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/15"
+              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-blue-600/15"
             >
               {saving ? "Saving Project..." : "Add Project"}
             </button>
