@@ -29,7 +29,10 @@ export default function SignupPage() {
       return;
     }
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: fullName.trim() } } });
+    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: {
+        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
+        data: { full_name: fullName.trim() },
+      } });
     setLoading(false);
     if (error) { setIsError(true); setMessage(error.message); return; }
     if (data.session) { router.replace("/dashboard"); router.refresh(); return; }

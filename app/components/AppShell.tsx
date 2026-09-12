@@ -186,7 +186,7 @@ export default function AppShell({
   }, [searchQuery, dbEvents, dbProjects]);
 
   return (
-    <main className="min-h-screen text-slate-100 relative">
+    <main className="relative min-h-screen text-slate-100">
       {/* Cinematic animated background */}
       <PremiumBackground />
 
