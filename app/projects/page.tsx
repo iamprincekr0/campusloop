@@ -24,7 +24,11 @@ export default function ProjectsPage() {
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
       if (!active) return;
       if (authError || !authUser) { router.replace("/login"); return; }
-      setUser({ id: authUser.id, fullName: authUser.user_metadata?.full_name ?? "Student", email: authUser.email ?? "" });
+      setUser({
+        id: authUser.id,
+        fullName: authUser.user_metadata?.full_name ?? authUser.email?.split("@")[0] ?? "there",
+        email: authUser.email ?? "",
+      });
       const { data, error: projectsError } = await supabase.from("projects").select("id,title,description,tech_stack,github_url,live_url,updated_at").eq("user_id", authUser.id).order("updated_at", { ascending: false });
       if (!active) return;
       if (projectsError) setError("Your projects could not be loaded just now.");

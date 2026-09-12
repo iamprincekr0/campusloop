@@ -283,6 +283,10 @@ export default function AppShell({
 
         {/* User profile section */}
         <div className="mt-auto border-t border-slate-900/60 pt-5">
+          <div className="mb-3 flex items-center justify-between px-2">
+            <Link href="/pricing" className="text-xs font-semibold text-cyan-300 transition hover:text-white">Plans</Link>
+            <Link href="/settings/billing" className="text-xs font-semibold text-slate-500 transition hover:text-white">Billing</Link>
+          </div>
           <Link
             href="/profile"
             className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-white/5"

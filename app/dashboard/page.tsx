@@ -100,7 +100,10 @@ export default function DashboardPage() {
 
       setUser({
         id: authUser.id,
-        fullName: authUser.user_metadata?.full_name ?? "Student",
+        fullName:
+          authUser.user_metadata?.full_name ??
+          authUser.email?.split("@")[0] ??
+          "there",
         email: authUser.email ?? "",
       });
 
@@ -191,7 +194,7 @@ export default function DashboardPage() {
     if (nextEvent) {
       return `Registration is open for ${nextEvent.title}.`;
     }
-    return "Explore new matches in the Opportunities tab!";
+    return "Explore opportunities that match your profile.";
   }, [attentionItems, events]);
 
   // Combined chronological Coming Up timeline of events and opportunities
@@ -334,7 +337,7 @@ export default function DashboardPage() {
             tone="bg-blue-500/10 text-blue-400 border border-blue-500/20"
           />
           <QuickAction
-            href="/events/extension-board-2026"
+            href="/events"
             icon={Compass}
             label="Browse Events"
             tone="bg-violet-500/10 text-violet-400 border border-violet-500/20"
@@ -370,7 +373,7 @@ export default function DashboardPage() {
                     icon={CalendarDays}
                     message="No upcoming events right now."
                     cta="Browse events"
-                    href="/events/extension-board-2026"
+                    href="/events"
                   />
                 ) : (
                   <div className="space-y-3">
@@ -645,7 +648,7 @@ export default function DashboardPage() {
                   <ProgressRow
                     label="Events available"
                     value={events.length}
-                    href="/events/extension-board-2026"
+                    href="/events"
                   />
                   <ProgressRow
                     label="Opportunities available"
