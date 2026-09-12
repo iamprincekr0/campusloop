@@ -170,7 +170,7 @@ export default function CampusPulse({
     if (!now) return null;
 
     const firstName =
-      fullName.trim().split(/\s+/)[0] || "Student";
+      fullName.trim().split(/\s+/)[0] || "there";
 
     const festival = getActiveFestival(now);
 
