@@ -81,7 +81,7 @@ export default function HomePage() {
             <Link href="/login" className="rounded-xl px-4 py-2 text-sm font-bold text-slate-300 transition hover:bg-white/5">
               Sign in
             </Link>
-            <Link href="/signup" className="rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-600/25 transition hover:-translate-y-0.5 hover:brightness-110">
+            <Link href="/signup" className="rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-600/25 transition hover:-translate-y-0.5 hover:brightness-110">
               Join CampusLoop
             </Link>
           </div>
