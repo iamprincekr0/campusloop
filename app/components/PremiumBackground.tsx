@@ -24,7 +24,7 @@ export default function PremiumBackground() {
   }, [pointerX, pointerY]);
 
   if (!mounted) {
-    return <div className="fixed inset-0 -z-20 bg-[#050816]" />;
+    return <div className="fixed inset-0 -z-20 bg-[#080712]" />;
   }
 
   // Animation variants that automatically respect user preferences
@@ -75,10 +75,10 @@ export default function PremiumBackground() {
 
   return (
     <div
-      className="fixed inset-0 -z-20 overflow-hidden bg-[#050816]"
+      className="fixed inset-0 -z-20 overflow-hidden bg-[#080712]"
       aria-hidden="true"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(15,23,42,0.62),rgba(5,8,22,0.96))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(30,18,52,0.68),rgba(8,7,18,0.97))]" />
 
       <motion.div
         className="pointer-events-none absolute left-1/2 top-[42%] h-[680px] w-[1100px] -translate-x-1/2 -translate-y-1/2 [perspective:900px]"
@@ -94,19 +94,19 @@ export default function PremiumBackground() {
       <motion.div
         variants={orb1Variants}
         animate="animate"
-        className="absolute -left-20 -top-20 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none"
+        className="absolute -left-20 -top-20 h-[500px] w-[500px] rounded-full bg-violet-600/12 blur-[130px] pointer-events-none"
       />
 
       <motion.div
         variants={orb2Variants}
         animate="animate"
-        className="absolute right-[-100px] top-[150px] h-[600px] w-[600px] rounded-full bg-violet-600/10 blur-[140px] pointer-events-none"
+        className="absolute right-[-100px] top-[150px] h-[600px] w-[600px] rounded-full bg-fuchsia-600/10 blur-[140px] pointer-events-none"
       />
 
       <motion.div
         variants={orb3Variants}
         animate="animate"
-        className="absolute left-[20%] bottom-[-150px] h-[550px] w-[550px] rounded-full bg-emerald-600/8 blur-[120px] pointer-events-none"
+        className="absolute left-[20%] bottom-[-150px] h-[550px] w-[550px] rounded-full bg-amber-500/8 blur-[120px] pointer-events-none"
       />
 
       {/* Subtle digital atmosphere grid */}

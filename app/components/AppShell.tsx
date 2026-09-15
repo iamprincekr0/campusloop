@@ -202,7 +202,7 @@ export default function AppShell({
 
       {/* Sidebar navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-slate-800/40 bg-slate-950/40 backdrop-blur-xl px-5 py-6 transition-transform duration-300 ease-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-slate-800/40 bg-[#0c0a18]/60 backdrop-blur-xl shadow-[inset_-1px_0_rgba(255,255,255,0.04)] px-5 py-6 transition-transform duration-300 ease-out lg:translate-x-0 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -317,7 +317,7 @@ export default function AppShell({
 
       {/* Main workspace layout */}
       <div className="lg:pl-[284px] min-h-screen flex flex-col">
-        <header className="sticky top-0 z-30 border-b border-slate-900/40 bg-[#050816]/75 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-slate-900/40 bg-[#080712]/78 backdrop-blur-xl">
           <div className="flex h-[76px] items-center gap-3 px-4 sm:px-7 lg:px-10">
             <button
               type="button"
