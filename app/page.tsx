@@ -61,7 +61,7 @@ export default function HomePage() {
       <PremiumBackground />
 
       <header className="relative z-40 mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <nav className="flex h-16 items-center justify-between rounded-2xl border border-slate-800/40 bg-slate-950/40 px-4 shadow-lg backdrop-blur-xl sm:px-5">
+        <nav className="flex h-16 items-center justify-between rounded-2xl border border-slate-800/40 bg-[#0c0a18]/60 px-4 shadow-[0_18px_70px_rgba(2,1,12,0.35)] backdrop-blur-xl sm:px-5">
           <Link href="/" className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/25">
               <GraduationCap className="h-5 w-5" />
@@ -81,7 +81,7 @@ export default function HomePage() {
             <Link href="/login" className="rounded-xl px-4 py-2 text-sm font-bold text-slate-300 transition hover:bg-white/5">
               Sign in
             </Link>
-            <Link href="/signup" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700">
+            <Link href="/signup" className="rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-600/25 transition hover:-translate-y-0.5 hover:brightness-110">
               Join CampusLoop
             </Link>
           </div>
