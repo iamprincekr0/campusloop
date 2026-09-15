@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { createGateway, generateText } from "ai";
+
+const gateway = createGateway();
 
 export async function POST(req: Request) {
   try {
@@ -109,39 +112,18 @@ Do not generate generic chatbot chatter. Give real, practical value.`;
       ...messages,
     ];
 
-    const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-    const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
+    const result = await generateText({
+      model: gateway("openai/gpt-4o-mini"),
+      system: systemPrompt,
+      messages: messages.map((message: { role: string; content: string }) => ({
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: message.content,
+      })),
+      maxOutputTokens: 700,
+      temperature: 0.7,
+    });
 
-    if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_API_TOKEN) {
-      return NextResponse.json(
-        { error: "API credentials missing" },
-        { status: 500 }
-      );
-    }
-
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/meta/llama-3-8b-instruct`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ messages: formattedMessages }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!data.success) {
-      console.error("Cloudflare Error:", data.errors);
-      return NextResponse.json(
-        { error: "Failed to fetch response from AI" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ reply: data.result.response });
+    return NextResponse.json({ reply: result.text });
   } catch (error) {
     console.error("API Route Error:", error);
     return NextResponse.json(
