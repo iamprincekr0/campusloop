@@ -111,7 +111,7 @@ How can I help you today?`,
       buttons.push({ label: "Open My Projects", href: "/projects" });
     }
     if (content.includes("/events")) {
-      buttons.push({ label: "View Events", href: "/events/extension-board-2026" });
+      buttons.push({ label: "View Events", href: "/events" });
     }
     return buttons;
   };
